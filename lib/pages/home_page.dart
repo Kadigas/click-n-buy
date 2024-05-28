@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/chat_page.dart';
+import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                     IconButton(
                         onPressed: () {
                           Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => ChatPage()));
+                              MaterialPageRoute(builder: (context) => ListUserPage()));
                         },
                         icon: const Icon(Icons.chat)),
 
