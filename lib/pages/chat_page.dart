@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,11 @@ import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({super.key});
+  final String userId;
+  final String userEmail;
+  final String otherUserId;
+
+  const ChatPage({super.key, required this.userId, required this.userEmail, required this.otherUserId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -48,7 +53,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage() async {
     if (_messageController.text.isNotEmpty) {
-      await chatService.sendMessage(receiverId, _messageController.text);
+      await chatService.sendMessage(widget.otherUserId, _messageController.text);
       _messageController.text = "";
     }
   }
@@ -57,7 +62,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("seller/customer name"),
+        title: Text(widget.userEmail),
         centerTitle: true,
         // action is multiple action on the right side
         actions: [
@@ -65,7 +70,10 @@ class _ChatPageState extends State<ChatPage> {
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Icon(Icons.info),
           ),
-          IconButton(onPressed: () async {}, icon: const Icon(Icons.delete))
+          IconButton(onPressed: () async {
+            await chatService.deleteMessage(widget.userId, widget.otherUserId);
+            Navigator.pop(context);
+          }, icon: const Icon(Icons.delete))
         ],
         backgroundColor: Colors.orangeAccent,
         leading: IconButton(
@@ -79,12 +87,12 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("current user: ${authService.getCurrentUser()!.email}"),
+            Text("current user: ${widget.userId}"),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("receiver name: $receiverName"),
-                Text("receiver id: $receiverId"),
+                Text("receiver id: ${widget.otherUserId}"),
                 TextField(
                   controller: _messageController,
                   decoration: InputDecoration(
@@ -94,54 +102,43 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 ),
-                IconButton(onPressed: () {
-                  sendMessage();
-                }, icon: Icon(Icons.send))
+                IconButton(
+                    onPressed: () {
+                      sendMessage();
+                    },
+                    icon: const Icon(Icons.send))
               ],
             ),
             Expanded(
-              child: StreamBuilder(
-                stream: chatService.getUserStream(),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: chatService.getMessages(
+                    widget.userId, widget.otherUserId),
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    List users = snapshot.data!;
-                    if (kDebugMode) {
-                      print(users);
-                    }
-                    // Return a widget displaying the users or whatever UI you need
-                    return ListView.builder(
-                      itemCount: users.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              receiverName = users[index]['email'];
-                              receiverId = users[index]['uid'];
-                            });
-                          },
-                          child: ListTile(
-                            title: Text(users[index]['email']
-                                .toString()), // Customize this as per your user model
-                          ),
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
                   }
-                },
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  return ChatBox(
-                      text: messages[index]['message'],
-                      isMe: messages[index]["isMe"],
-                      timestamp: messages[index]['timestamp']);
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text("No messages yet"));
+                  }
+
+                  var messages = snapshot.data!.docs.map((doc) {
+                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+                    return ChatBox(
+                      text: data['message'],
+                      isMe: data['senderId'] == authService.getCurrentUser()!.uid,
+                      timestamp: data['timestamp'].toDate(),
+                    );
+                  }).toList();
+
+                  return ListView(
+                    children: messages,
+                  );
                 },
               ),
             ),

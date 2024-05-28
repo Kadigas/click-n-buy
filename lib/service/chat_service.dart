@@ -39,4 +39,56 @@ class ChatService {
         .collection("messages")
         .add(newMessage.toMap());
   }
+
+  Stream<QuerySnapshot> getMessages(String userId, otherUserId) {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    String chatroomId = ids.join('_');
+
+    return _firestore
+        .collection("chat_rooms")
+        .doc(chatroomId)
+        .collection("messages")
+        .orderBy("timestamp", descending: false)
+        .snapshots();
+  }
+
+  Future<void> deleteMessage(String userId, String otherUserId) async {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    String chatroomId = ids.join('_');
+
+    await deleteDocumentWithSubcollections('chat_rooms', chatroomId);
+  }
+
+  Future<void> deleteDocumentWithSubcollections(String collectionPath, String documentId) async {
+    // Reference to the document
+    var documentReference = FirebaseFirestore.instance.collection(collectionPath).doc(documentId);
+
+    // List of known subcollections (you need to specify these manually)
+    List<String> subcollections = ['messages', 'attachments']; // Example subcollections
+
+    // Delete all subcollections
+    for (var subcollection in subcollections) {
+      await deleteCollection('$collectionPath/$documentId/$subcollection', batchSize: 10);
+    }
+
+    // Delete the document itself
+    await documentReference.delete();
+  }
+
+  Future<void> deleteCollection(String collectionPath, {int batchSize = 10}) async {
+    var collectionReference = FirebaseFirestore.instance.collection(collectionPath);
+
+    var querySnapshot;
+    do {
+      querySnapshot = await collectionReference.limit(batchSize).get();
+
+      var batch = FirebaseFirestore.instance.batch();
+      for (var document in querySnapshot.docs) {
+        batch.delete(document.reference);
+      }
+      await batch.commit();
+    } while (querySnapshot.size >= batchSize);
+  }
 }
