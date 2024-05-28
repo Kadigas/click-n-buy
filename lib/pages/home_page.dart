@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
+import 'package:fp_ppb/service/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key});
@@ -15,7 +16,8 @@ class _HomePageState extends State<HomePage> {
   final itemController = TextEditingController();
 
   void signUserOut() {
-    FirebaseAuth.instance.signOut();
+    final authService = AuthService();
+    authService.signOut();
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:fp_ppb/components/square_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -20,6 +21,8 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   void signUserIn() async {
+    final authService = AuthService();
+
     showDialog(
         context: context, builder: (context) {
         return const Center(
@@ -29,10 +32,7 @@ class _LoginPageState extends State<LoginPage> {
     );
     
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
+      await authService.signInWithEmailPassword(emailController.text, passwordController.text);
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
