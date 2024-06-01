@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fp_ppb/components/big_button.dart';
 import 'package:fp_ppb/components/square_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
-import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  MyButton(
+                  BigButton(
                     onTap: signUserIn,
                     msg: 'Sign In',
                     color: Colors.blueAccent,

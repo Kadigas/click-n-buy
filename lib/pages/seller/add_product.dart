@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_ppb/components/my_textfield.dart';
-import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/components/big_button.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
 class AddProductPage extends StatefulWidget {
@@ -78,52 +77,49 @@ class _AddProductPageState extends State<AddProductPage> {
       backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Center(
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productNameController,
-                hintText: 'Name',
-                obscureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productDescriptionController,
-                hintText: 'Description',
-                obscureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productCategoryController,
-                hintText: 'Category',
-                obscureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productConditionController,
-                hintText: 'Condition',
-                obscureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productPriceController,
-                hintText: 'Price',
-                obscureText: false,
-              ),
-              const SizedBox(height: 10),
-              MyTextField(
-                controller: productStockController,
-                hintText: 'Stock',
-                obscureText: false,
-              ),
-              const SizedBox(height: 25),
-              MyButton(
-                onTap: addProduct,
-                msg: 'Add Product',
-                color: Colors.black,
-              ),
-            ]),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Form(
+              child: Column(children: [
+                TextFormField(
+                  controller: productNameController,
+                  decoration: InputDecoration(labelText: 'Product Name'),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: productCategoryController,
+                  decoration: InputDecoration(labelText: 'Category'),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: productPriceController,
+                  decoration: InputDecoration(labelText: 'Price'),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: productStockController,
+                  decoration: InputDecoration(labelText: 'Stock'),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: productDescriptionController,
+                  decoration: InputDecoration(labelText: 'Description'),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: productConditionController,
+                  decoration: InputDecoration(labelText: 'Condition'),
+                ),
+                SizedBox(height: 20),
+                BigButton(
+                  onTap: addProduct,
+                  msg: 'Add Product',
+                  color: Colors.black,
+                ),
+              ]),
+            ),
           ),
         ),
       ),

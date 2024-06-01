@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/components/big_button.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
 class EditProductPage extends StatefulWidget {
@@ -154,7 +154,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       decoration: InputDecoration(labelText: 'Condition'),
                     ),
                     SizedBox(height: 20),
-                    MyButton(
+                    BigButton(
                       onTap: () {
                         editProduct();
                       },

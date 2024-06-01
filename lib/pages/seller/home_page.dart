@@ -108,7 +108,8 @@ class _SellerHomePageState extends State<SellerHomePage> {
                         itemBuilder: (context, index) {
                           DocumentSnapshot document = productList[index];
                           String productID = document.id;
-                          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                          Map<String, dynamic> data =
+                              document.data() as Map<String, dynamic>;
                           String productName = data['productName'];
                           double productPrice = data['productPrice'];
                           int productStock = data['productStock'];
@@ -128,8 +129,8 @@ class _SellerHomePageState extends State<SellerHomePage> {
                             child: Card(
                               child: ListTile(
                                 title: Text(
-                                    productName,
-                                  style: TextStyle(
+                                  productName,
+                                  style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -138,15 +139,19 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(price, style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold,
-                                    )),
+                                    Text(price,
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                        )),
                                     Text('Stock: $productStock'),
-                                    SizedBox(height: 10,),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
                                         MyButton(
                                           msg: 'Change Price',
@@ -155,19 +160,25 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                             showDialog(
                                               context: context,
                                               builder: (context) {
-                                                final priceController = TextEditingController();
+                                                final priceController =
+                                                    TextEditingController();
                                                 return AlertDialog(
                                                   title: Text('Change Price'),
                                                   content: TextField(
                                                     controller: priceController,
-                                                    keyboardType: TextInputType.number,
-                                                    decoration: InputDecoration(hintText: 'New Price'),
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration: InputDecoration(
+                                                        hintText: 'New Price'),
                                                   ),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
-                                                        String newPrice = priceController.text;
-                                                        changePrice(productID, newPrice);
+                                                        String newPrice =
+                                                            priceController
+                                                                .text;
+                                                        changePrice(productID,
+                                                            newPrice);
                                                         Navigator.pop(context);
                                                       },
                                                       child: Text('Change'),
@@ -185,19 +196,25 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                             showDialog(
                                               context: context,
                                               builder: (context) {
-                                                final stockController = TextEditingController();
+                                                final stockController =
+                                                    TextEditingController();
                                                 return AlertDialog(
                                                   title: Text('Change Stock'),
                                                   content: TextField(
                                                     controller: stockController,
-                                                    keyboardType: TextInputType.number,
-                                                    decoration: InputDecoration(hintText: 'New Stock'),
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration: InputDecoration(
+                                                        hintText: 'New Stock'),
                                                   ),
                                                   actions: [
                                                     TextButton(
                                                       onPressed: () {
-                                                        String newStock = stockController.text;
-                                                        changePrice(productID, newStock);
+                                                        String newStock =
+                                                            stockController
+                                                                .text;
+                                                        changePrice(productID,
+                                                            newStock);
                                                         Navigator.pop(context);
                                                       },
                                                       child: Text('Change'),
@@ -256,7 +273,8 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const AddProductPage(),
+                                      builder: (context) =>
+                                          const AddProductPage(),
                                     ),
                                   );
                                 },
