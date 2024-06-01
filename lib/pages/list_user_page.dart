@@ -7,6 +7,7 @@ import '../service/chat_service.dart';
 
 class ListUserPage extends StatelessWidget {
   ListUserPage({super.key});
+
   final ChatService chatService = ChatService();
   final AuthService authService = AuthService();
 
@@ -17,13 +18,6 @@ class ListUserPage extends StatelessWidget {
         title: const Text("List User"),
         centerTitle: true,
         // action is multiple action on the right side
-        actions: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: Icon(Icons.info),
-          ),
-          IconButton(onPressed: () async {}, icon: const Icon(Icons.delete))
-        ],
         backgroundColor: Colors.orangeAccent,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -47,7 +41,15 @@ class ListUserPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage()));
+                      String userId = authService.getCurrentUser()!.uid;
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ChatPage(
+                                    userEmail: users[index]['email'].toString(),
+                                    userId: userId,
+                                    otherUserId: users[index]['uid'].toString(),
+                                  )));
                     },
                     child: ListTile(
                       title: Text(users[index]['email']
