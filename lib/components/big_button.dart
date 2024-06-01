@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MyButton extends StatelessWidget {
+class BigButton extends StatelessWidget {
   final Function()? onTap;
   final String msg;
   final Color color;
 
-  const MyButton({
+  const BigButton({
     super.key,
     required this.onTap,
     required this.msg,
@@ -17,8 +17,8 @@ class MyButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(horizontal: 5),
+        padding: const EdgeInsets.all(25),
+        margin: const EdgeInsets.symmetric(horizontal: 25),
         decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(8)

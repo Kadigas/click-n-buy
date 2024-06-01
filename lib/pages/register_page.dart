@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fp_ppb/components/big_button.dart';
 import 'package:fp_ppb/components/square_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
-import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -121,7 +121,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: true,
                   ),
                   const SizedBox(height: 25),
-                  MyButton(
+                  BigButton(
                     onTap: signUserUp,
                     msg: 'Sign Up',
                     color: Colors.black,

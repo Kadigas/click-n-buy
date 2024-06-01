@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 SizedBox(height: 25),
-                Text(
+                const Text(
                   "Elektronik",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
