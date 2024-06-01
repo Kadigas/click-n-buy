@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:fp_ppb/models/users.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -29,7 +29,7 @@ class AuthService {
     }
   }
 
-  Future<UserCredential> signUpWithEmailPassword(String email, password) async {
+  Future<UserCredential> signUpWithEmailPassword(String email, password, username, firstName, lastName) async {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
@@ -42,6 +42,23 @@ class AuthService {
 
       // Get the updated user
       // User? updatedUser = FirebaseAuth.instance.currentUser;
+
+      final Timestamp timestamp = Timestamp.now();
+
+      Users newUser = Users(
+          uid: userCredential.user!.uid,
+          email: email,
+          username: username,
+          firstName: firstName,
+          lastName: lastName,
+          role: 'customer',
+          address: '',
+          timestamp: timestamp
+      );
+
+      _firestore.collection("users")
+          .doc(userCredential.user!.uid)
+          .set(newUser.toMap());
 
       return userCredential;
     } on FirebaseAuthException catch (e) {

@@ -20,6 +20,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  final usernameController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
 
   void signUserUp() async {
     final authService = AuthService();
@@ -41,6 +44,9 @@ class _RegisterPageState extends State<RegisterPage> {
       await authService.signUpWithEmailPassword(
         emailController.text,
         passwordController.text,
+        usernameController.text,
+        firstNameController.text,
+        lastNameController.text,
       );
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -73,22 +79,33 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 100),
+                  const SizedBox(height: 50),
                   Image.network(
                     "https://static.wikia.nocookie.net/kamenrider/images/a/a5/Hiden_Intelligence_Logo.png/revision/latest?cb=20221105005206",
                     height: 50,
                   ),
                   const SizedBox(height: 25),
-                  const Text(
-                    'Welcome! Let\'s create an account for you!',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
                   MyTextField(
                     controller: emailController,
                     hintText: 'Email',
+                    obscureText: false,
+                  ),
+                  const SizedBox(height: 10),
+                  MyTextField(
+                    controller: usernameController,
+                    hintText: 'Username',
+                    obscureText: false,
+                  ),
+                  const SizedBox(height: 10),
+                  MyTextField(
+                    controller: firstNameController,
+                    hintText: 'First Name',
+                    obscureText: false,
+                  ),
+                  const SizedBox(height: 10),
+                  MyTextField(
+                    controller: lastNameController,
+                    hintText: 'Last Name',
                     obscureText: false,
                   ),
                   const SizedBox(height: 10),

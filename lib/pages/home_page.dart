@@ -25,30 +25,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   actions: [
-      //     Row(
-      //       mainAxisAlignment: MainAxisAlignment.center,
-      //       crossAxisAlignment: CrossAxisAlignment.stretch,
-      //       children: [
-      //         // MyTextField(
-      //         //     controller: itemController,
-      //         //     hintText: "search . . .",
-      //         //     obscureText: false
-      //         // ),
-      //         const Icon(Icons.search),
-      //         IconButton(
-      //             onPressed: (){},
-      //             icon: const Icon(Icons.shopping_cart)
-      //         ),
-      //         IconButton(
-      //             onPressed: signUserOut,
-      //             icon: const Icon(Icons.logout),
-      //         ),
-      //       ],
-      //     )
-      //   ],
-      // ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
