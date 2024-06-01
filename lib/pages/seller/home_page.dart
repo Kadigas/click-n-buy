@@ -99,11 +99,15 @@ class _SellerHomePageState extends State<SellerHomePage> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const Text('My Products'),
+                      const Text(
+                        'My Products',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 18.0),
+                      ),
                       const SizedBox(height: 10),
                       ListView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: productList.length,
                         itemBuilder: (context, index) {
                           DocumentSnapshot document = productList[index];
@@ -127,108 +131,134 @@ class _SellerHomePageState extends State<SellerHomePage> {
                               );
                             },
                             child: Card(
-                              child: ListTile(
-                                title: Text(
-                                  productName,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
+                              child: Row(
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.keyboard,
+                                      size: 50,
+                                    ),
                                   ),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(price,
+                                  Expanded(
+                                    child: ListTile(
+                                      title: Text(
+                                        productName,
                                         style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                                    Text('Stock: $productStock'),
-                                    SizedBox(
-                                      height: 10,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            price,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text('Stock: $productStock'),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              MyButton(
+                                                msg: 'Change Price',
+                                                color: Colors.black,
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      final priceController =
+                                                          TextEditingController();
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            'Change Price'),
+                                                        content: TextField(
+                                                          controller:
+                                                              priceController,
+                                                          keyboardType:
+                                                              TextInputType
+                                                                  .number,
+                                                          decoration:
+                                                              const InputDecoration(
+                                                                  hintText:
+                                                                      'New Price'),
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              String newPrice =
+                                                                  priceController
+                                                                      .text;
+                                                              changePrice(
+                                                                  productID,
+                                                                  newPrice);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'Change'),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                              MyButton(
+                                                msg: 'Change Stock',
+                                                color: Colors.black,
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      final stockController =
+                                                          TextEditingController();
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            'Change Stock'),
+                                                        content: TextField(
+                                                          controller:
+                                                              stockController,
+                                                          keyboardType:
+                                                              TextInputType
+                                                                  .number,
+                                                          decoration:
+                                                              const InputDecoration(
+                                                                  hintText:
+                                                                      'New Stock'),
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              String newStock =
+                                                                  stockController
+                                                                      .text;
+                                                              changePrice(
+                                                                  productID,
+                                                                  newStock);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'Change'),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        MyButton(
-                                          msg: 'Change Price',
-                                          color: Colors.black,
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                final priceController =
-                                                    TextEditingController();
-                                                return AlertDialog(
-                                                  title: Text('Change Price'),
-                                                  content: TextField(
-                                                    controller: priceController,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    decoration: InputDecoration(
-                                                        hintText: 'New Price'),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        String newPrice =
-                                                            priceController
-                                                                .text;
-                                                        changePrice(productID,
-                                                            newPrice);
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('Change'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                        ),
-                                        MyButton(
-                                          msg: 'Change Stock',
-                                          color: Colors.black,
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                final stockController =
-                                                    TextEditingController();
-                                                return AlertDialog(
-                                                  title: Text('Change Stock'),
-                                                  content: TextField(
-                                                    controller: stockController,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    decoration: InputDecoration(
-                                                        hintText: 'New Stock'),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        String newStock =
-                                                            stockController
-                                                                .text;
-                                                        changePrice(productID,
-                                                            newStock);
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: Text('Change'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
