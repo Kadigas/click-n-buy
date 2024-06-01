@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/components/my_button.dart';
+import 'package:intl/intl.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
-import 'package:fp_ppb/pages/chat_page.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/pages/seller/add_product.dart';
+import 'package:fp_ppb/pages/seller/edit_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
@@ -22,9 +24,19 @@ class _SellerHomePageState extends State<SellerHomePage> {
 
   final itemController = TextEditingController();
 
+  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
+
   void signUserOut() {
     final authService = AuthService();
     authService.signOut();
+  }
+
+  void changePrice(String productID, String newPrice) {
+    productService.updateProductPrice(productID, newPrice);
+  }
+
+  void changeStock(String productID, String newStock) {
+    productService.updateProductStock(productID, newStock);
   }
 
   @override
@@ -43,115 +55,168 @@ class _SellerHomePageState extends State<SellerHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: MyTextField(
-                                controller: itemController,
-                                hintText: "Search...",
-                                obscureText: false),
+                              controller: itemController,
+                              hintText: "Search...",
+                              obscureText: false,
+                            ),
                           ),
-                          // const Icon(Icons.search),
                           Row(
                             children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AddProductPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.upload),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ListUserPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.chat),
+                              ),
                               IconButton(
                                 onPressed: signUserOut,
                                 icon: const Icon(Icons.logout),
                               ),
-                              IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AddProductPage()));
-                                  },
-                                  icon: const Icon(Icons.upload)),
-                              IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListUserPage()));
-                                  },
-                                  icon: const Icon(Icons.chat)),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       const Text('My Products'),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: productList.map((document) {
-                            String docID = document.id;
-                            Map<String, dynamic> data =
-                                document.data() as Map<String, dynamic>;
-                            String productName = data['productName'];
-                            String price = data['productPrice'];
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: productList.length,
+                        itemBuilder: (context, index) {
+                          DocumentSnapshot document = productList[index];
+                          String productID = document.id;
+                          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                          String productName = data['productName'];
+                          double productPrice = data['productPrice'];
+                          int productStock = data['productStock'];
+                          String price = formatCurrency.format(productPrice);
 
-                            return Card(
-                              child: Container(
-                                width: 200.0,
-                                // Set the width of each card as needed
-                                margin: EdgeInsets.all(8.0),
-                                // Add some margin between cards
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProductPage(
+                                    productID: productID,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              child: ListTile(
+                                title: Text(
+                                    productName,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(
-                                      Icons.keyboard,
-                                      size: 100,
-                                    ),
-                                    const SizedBox(height: 10.0),
-                                    // Space between icon and text
-                                    Text(
-                                      productName,
-                                      style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    SizedBox(height: 5.0),
-                                    // Space between productName and price
-                                    Text(
-                                      'Rp${price.toString()}',
-                                      style: TextStyle(
-                                          fontSize: 16.0, color: Colors.grey),
-                                    ),
+                                    Text(price, style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.bold,
+                                    )),
+                                    Text('Stock: $productStock'),
+                                    SizedBox(height: 10,),
                                     Row(
-                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.edit),
+                                        MyButton(
+                                          msg: 'Change Price',
+                                          color: Colors.black,
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                final priceController = TextEditingController();
+                                                return AlertDialog(
+                                                  title: Text('Change Price'),
+                                                  content: TextField(
+                                                    controller: priceController,
+                                                    keyboardType: TextInputType.number,
+                                                    decoration: InputDecoration(hintText: 'New Price'),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        String newPrice = priceController.text;
+                                                        changePrice(productID, newPrice);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Change'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
                                         ),
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: const Icon(Icons.delete),
+                                        MyButton(
+                                          msg: 'Change Stock',
+                                          color: Colors.black,
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                final stockController = TextEditingController();
+                                                return AlertDialog(
+                                                  title: Text('Change Stock'),
+                                                  content: TextField(
+                                                    controller: stockController,
+                                                    keyboardType: TextInputType.number,
+                                                    decoration: InputDecoration(hintText: 'New Stock'),
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        String newStock = stockController.text;
+                                                        changePrice(productID, newStock);
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: Text('Change'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        ),
+                            ),
+                          );
+                        },
                       ),
-
-                      // Add any widgets you want to display below the ListView here
                       ElevatedButton(
                         onPressed: () {},
                         child: Text('Footer'),
@@ -169,19 +234,17 @@ class _SellerHomePageState extends State<SellerHomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
                             child: MyTextField(
-                                controller: itemController,
-                                hintText: "Search...",
-                                obscureText: false),
+                              controller: itemController,
+                              hintText: "Search...",
+                              obscureText: false,
+                            ),
                           ),
-                          // const Icon(Icons.search),
                           Row(
                             children: [
                               IconButton(
@@ -189,33 +252,35 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                 icon: const Icon(Icons.logout),
                               ),
                               IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const AddProductPage()));
-                                  },
-                                  icon: const Icon(Icons.upload)),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AddProductPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.upload),
+                              ),
                               IconButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ListUserPage()));
-                                  },
-                                  icon: const Icon(Icons.chat)),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ListUserPage(),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.chat),
+                              ),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       const Center(
                         child: Text('No Product.'),
-                      )
+                      ),
                     ],
                   ),
                 ),

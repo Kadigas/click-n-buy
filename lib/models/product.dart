@@ -5,10 +5,11 @@ class Product {
   final String productName;
   final String productDescription;
   final String productCategory;
-  final String productPrice;
-  final String productStock;
+  final double productPrice;
+  final int productStock;
   final String productCondition;
-  final Timestamp timestamp;
+  final Timestamp createdAt;
+  final Timestamp updatedAt;
 
   Product({
     required this.sellerUid,
@@ -18,7 +19,8 @@ class Product {
     required this.productPrice,
     required this.productStock,
     required this.productCondition,
-    required this.timestamp
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -30,7 +32,8 @@ class Product {
       'productPrice': productPrice,
       'productStock': productStock,
       'productCondition': productCondition,
-      'timestamp': timestamp
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
     };
   }
 }

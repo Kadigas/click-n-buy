@@ -5,8 +5,8 @@ import 'package:fp_ppb/models/product.dart';
 class ProductService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final CollectionReference products = FirebaseFirestore.instance.collection(
-      'products');
+  final CollectionReference products =
+      FirebaseFirestore.instance.collection('products');
 
   User? getCurrentUser() {
     return _auth.currentUser;
@@ -23,18 +23,62 @@ class ProductService {
         productName: productName,
         productDescription: productDescription,
         productCategory: productCategory,
-        productPrice: productPrice,
-        productStock: productStock,
+        productPrice: double.parse(productPrice),
+        productStock: int.parse(productStock),
         productCondition: productCondition,
-        timestamp: timestamp
-    );
+        createdAt: timestamp,
+        updatedAt: timestamp);
 
     return products.add(newProduct.toMap());
   }
 
   Stream<QuerySnapshot> getProductStream() {
-    final productStream = products.orderBy('timestamp', descending: false).snapshots();
+    final productStream =
+        products.orderBy('createdAt', descending: false).snapshots();
 
     return productStream;
+  }
+
+  Future<void> updateProduct(
+      String productID,
+      String productName,
+      productDescription,
+      productCategory,
+      productPrice,
+      productStock,
+      productCondition,
+      createdAt) {
+    final Timestamp timestamp = Timestamp.now();
+
+    final User user = getCurrentUser()!;
+
+    Product updateProduct = Product(
+        sellerUid: user.uid,
+        productName: productName,
+        productDescription: productDescription,
+        productCategory: productCategory,
+        productPrice: double.parse(productPrice),
+        productStock: int.parse(productStock),
+        productCondition: productCondition,
+        createdAt: createdAt,
+        updatedAt: timestamp);
+
+    return products.doc(productID).update(updateProduct.toMap());
+  }
+
+  Future<void> updateProductPrice(String productID, productPrice){
+    final Timestamp timestamp = Timestamp.now();
+    return products.doc(productID).update({
+      'productPrice': double.parse(productPrice),
+      'updatedAt': timestamp
+    });
+  }
+
+  Future<void> updateProductStock(String productID, productStock){
+    final Timestamp timestamp = Timestamp.now();
+    return products.doc(productID).update({
+      'productPrice': int.parse(productStock),
+      'updatedAt': timestamp
+    });
   }
 }
