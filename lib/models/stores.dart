@@ -1,23 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Users {
+class Stores {
   final String uid;
   final String email;
-  final String username;
-  final String firstName;
-  final String lastName;
-  final bool hasStore;
+  final String storeName;
   final String address;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
-  Users({
+  Stores({
     required this.uid,
     required this.email,
-    required this.username,
-    required this.firstName,
-    required this.lastName,
-    required this.hasStore,
+    required this.storeName,
     required this.address,
     required this.createdAt,
     required this.updatedAt,
@@ -27,10 +21,7 @@ class Users {
     return {
       'uid': uid,
       'email': email,
-      'username': username,
-      'firstName': firstName,
-      'lastName': lastName,
-      'hasStore': hasStore,
+      'storeName': storeName,
       'address': address,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
