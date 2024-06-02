@@ -81,4 +81,8 @@ class ProductService {
       'updatedAt': timestamp
     });
   }
+
+  Future<void> deleteProduct(String productID) {
+    return products.doc(productID).delete();
+  }
 }

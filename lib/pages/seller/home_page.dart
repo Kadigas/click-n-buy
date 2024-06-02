@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/pages/seller/show_product.dart';
 import 'package:intl/intl.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
@@ -73,7 +74,7 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => AddProductPage(),
+                                      builder: (context) => const AddProductPage(),
                                     ),
                                   );
                                 },
@@ -124,7 +125,7 @@ class _SellerHomePageState extends State<SellerHomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => EditProductPage(
+                                  builder: (context) => ShowProductPage(
                                     productID: productID,
                                   ),
                                 ),
