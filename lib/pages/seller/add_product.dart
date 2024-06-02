@@ -37,6 +37,7 @@ class _AddProductPageState extends State<AddProductPage> {
         productStockController.text,
         productConditionController.text,
       );
+      Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);

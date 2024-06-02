@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/components/my_button.dart';
@@ -28,9 +29,40 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .get();
   }
 
-  void deleteProduct(String productID) {
-    productService.deleteProduct(productID);
-    Navigator.pop(context);
+  void deleteProduct(String productID) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+    );
+    try {
+      await productService.deleteProduct(productID);
+      Navigator.of(context, rootNavigator: true).pop();
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      showErrorMessage(e.code);
+    }
+  }
+
+  void showErrorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          title: Center(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
