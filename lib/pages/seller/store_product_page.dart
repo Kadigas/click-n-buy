@@ -11,14 +11,14 @@ import 'package:fp_ppb/pages/seller/edit_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
-class SellerHomePage extends StatefulWidget {
-  const SellerHomePage({super.key});
+class StoreProductPage extends StatefulWidget {
+  const StoreProductPage({super.key});
 
   @override
-  State<SellerHomePage> createState() => _SellerHomePageState();
+  State<StoreProductPage> createState() => _StoreProductPageState();
 }
 
-class _SellerHomePageState extends State<SellerHomePage> {
+class _StoreProductPageState extends State<StoreProductPage> {
   final user = FirebaseAuth.instance.currentUser!;
 
   final ProductService productService = ProductService();

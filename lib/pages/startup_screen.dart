@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/pages/home_page.dart';
-import 'package:fp_ppb/pages/seller/home_page.dart';
-import 'package:fp_ppb/pages/seller/profile_page.dart';
-import 'package:fp_ppb/pages/seller/transactions_page.dart';
+import 'package:fp_ppb/pages/profile_page.dart';
+import 'package:fp_ppb/pages/transaction_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
-class SellerStartupScreen extends StatefulWidget {
-  const SellerStartupScreen({super.key});
+class StartupScreen extends StatefulWidget {
+  const StartupScreen({super.key});
 
   @override
-  State<SellerStartupScreen> createState() => _SellerStartupScreenState();
+  State<StartupScreen> createState() => _StartupScreenState();
 }
 
-class _SellerStartupScreenState extends State<SellerStartupScreen> {
+class _StartupScreenState extends State<StartupScreen> {
   final PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
   List<Widget> _buildScreens() {
     return [
-      const SellerHomePage(),
-      const SellerTransactionsPage(),
-      const SellerProfilePage(),
+      const HomePage(),
+      const TransactionPage(),
+      const ProfilePage(),
     ];
   }
 

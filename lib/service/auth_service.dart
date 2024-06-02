@@ -51,9 +51,10 @@ class AuthService {
           username: username,
           firstName: firstName,
           lastName: lastName,
-          role: 'customer',
+          hasStore: false,
           address: '',
-          timestamp: timestamp
+          createdAt: timestamp,
+          updatedAt: timestamp,
       );
 
       _firestore.collection("users")
