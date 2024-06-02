@@ -42,8 +42,9 @@ class _EditProductPageState extends State<EditProductPage> {
         productPriceController.text,
         productStockController.text,
         productConditionController.text,
-        createdAt
+        createdAt,
       );
+      Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
@@ -64,7 +65,8 @@ class _EditProductPageState extends State<EditProductPage> {
               ),
             ),
           );
-        });
+        },
+    );
   }
 
   @override
