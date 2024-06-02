@@ -74,7 +74,8 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const AddProductPage(),
+                                      builder: (context) =>
+                                          const AddProductPage(),
                                     ),
                                   );
                                 },
@@ -238,7 +239,7 @@ class _SellerHomePageState extends State<SellerHomePage> {
                                                               String newStock =
                                                                   stockController
                                                                       .text;
-                                                              changePrice(
+                                                              changeStock(
                                                                   productID,
                                                                   newStock);
                                                               Navigator.pop(
