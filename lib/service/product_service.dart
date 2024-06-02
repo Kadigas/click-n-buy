@@ -77,7 +77,7 @@ class ProductService {
   Future<void> updateProductStock(String productID, productStock){
     final Timestamp timestamp = Timestamp.now();
     return products.doc(productID).update({
-      'productPrice': int.parse(productStock),
+      'productStock': int.parse(productStock),
       'updatedAt': timestamp
     });
   }
