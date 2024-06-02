@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Stores {
-  final String uid;
+class Store {
+  final String sellerUid;
   final String email;
   final String storeName;
   final String address;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
-  Stores({
-    required this.uid,
+  Store({
+    required this.sellerUid,
     required this.email,
     required this.storeName,
     required this.address,
@@ -19,7 +19,7 @@ class Stores {
 
   Map<String, dynamic> toMap() {
     return {
-      'uid': uid,
+      'sellerUid': sellerUid,
       'email': email,
       'storeName': storeName,
       'address': address,
