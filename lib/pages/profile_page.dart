@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/components/small_button.dart';
 import 'package:fp_ppb/pages/seller/register_store_page.dart';
 import 'package:fp_ppb/pages/seller/store_profile_page.dart';
-import 'package:fp_ppb/service/auth_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
