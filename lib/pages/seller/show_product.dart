@@ -2,7 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/enums/product_category.dart';
+import 'package:fp_ppb/enums/product_condition.dart';
 import 'package:fp_ppb/pages/seller/edit_product.dart';
+import 'package:fp_ppb/service/enum_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
 
@@ -21,6 +24,7 @@ class ShowProductPage extends StatefulWidget {
 class _ShowProductPageState extends State<ShowProductPage> {
   late Future<DocumentSnapshot> _document;
   final ProductService productService = ProductService();
+  final EnumService enumService = EnumService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
 
   @override
@@ -105,10 +109,10 @@ class _ShowProductPageState extends State<ShowProductPage> {
               snapshot.data!.data() as Map<String, dynamic>;
           String productName = data['productName'];
           String productDescription = data['productDescription'];
-          String productCategory = data['productCategory'];
+          ProductCategory productCategory = enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
           String productStock = data['productStock'].toString();
-          String productCondition = data['productCondition'];
+          ProductCondition productCondition = enumService.parseProductCondition(data['productCondition']);
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -151,9 +155,9 @@ class _ShowProductPageState extends State<ShowProductPage> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      Text('Category: $productCategory'),
+                      Text('Category: ${productCategory.displayName}'),
                       const SizedBox(height: 10),
-                      Text('Condition: $productCondition'),
+                      Text('Condition: ${productCondition.displayName}'),
                       const SizedBox(
                         height: 10,
                       ),

@@ -2,10 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/enums/product_category.dart';
+import 'package:fp_ppb/enums/product_condition.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
 class EditProductPage extends StatefulWidget {
   final String productID;
+  final String storeID;
 
   final String storeID;
 
@@ -22,10 +25,42 @@ class _EditProductPageState extends State<EditProductPage> {
   late String storeId;
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
-  final productCategoryController = TextEditingController();
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
-  final productConditionController = TextEditingController();
+  ProductCategory? selectedCategory;
+  ProductCondition? selectedCondition;
+
+  ProductCategory? getCategoryFromString(String category) {
+    switch (category) {
+      case 'electronics':
+        return ProductCategory.electronics;
+      case 'fashion':
+        return ProductCategory.fashion;
+      case 'home':
+        return ProductCategory.home;
+      case 'beauty':
+        return ProductCategory.beauty;
+      case 'sports':
+        return ProductCategory.sports;
+      case 'toys':
+        return ProductCategory.toys;
+      default:
+        return null;
+    }
+  }
+
+  ProductCondition? getConditionFromString(String condition) {
+    switch (condition) {
+      case 'brandNew':
+        return ProductCondition.brandNew;
+      case 'used':
+        return ProductCondition.used;
+      case 'refurbished':
+        return ProductCondition.refurbished;
+      default:
+        return null;
+    }
+  }
 
   void editProduct() async {
     final productService = ProductService();
@@ -43,10 +78,18 @@ class _EditProductPageState extends State<EditProductPage> {
         widget.storeID,
         productNameController.text,
         productDescriptionController.text,
-        productCategoryController.text,
+        selectedCategory.toString().split('.').last,
         productPriceController.text,
         productStockController.text,
-        productConditionController.text,
+        selectedCondition.toString().split('.').last,
+        createdAt,
+      );
+      await productService.updateStoreProduct(
+        widget.productID,
+        widget.storeID,
+        productNameController.text,
+        productPriceController.text,
+        productStockController.text,
         createdAt,
       );
       await productService.updateStoreProduct(
@@ -93,10 +136,10 @@ class _EditProductPageState extends State<EditProductPage> {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         productNameController.text = data['productName'];
         productDescriptionController.text = data['productDescription'];
-        productCategoryController.text = data['productCategory'];
-        productPriceController.text = data['productPrice'].toString();
+        productPriceController.text = data['productPrice'].toInt().toString();
         productStockController.text = data['productStock'].toString();
-        productConditionController.text = data['productCondition'];
+        selectedCategory = getCategoryFromString(data['productCategory']);
+        selectedCondition = getConditionFromString(data['productCondition']);
         createdAt = data['createdAt'];
       }
     });
@@ -146,9 +189,20 @@ class _EditProductPageState extends State<EditProductPage> {
                           const InputDecoration(labelText: 'Product Name'),
                     ),
                     const SizedBox(height: 10),
-                    TextFormField(
-                      controller: productCategoryController,
+                    DropdownButtonFormField<ProductCategory>(
                       decoration: const InputDecoration(labelText: 'Category'),
+                      value: selectedCategory,
+                      onChanged: (ProductCategory? newValue) {
+                        setState(() {
+                          selectedCategory = newValue!;
+                        });
+                      },
+                      items: ProductCategory.values.map((ProductCategory category) {
+                        return DropdownMenuItem<ProductCategory>(
+                          value: category,
+                          child: Text(category.displayName),
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
@@ -169,9 +223,20 @@ class _EditProductPageState extends State<EditProductPage> {
                           const InputDecoration(labelText: 'Description'),
                     ),
                     const SizedBox(height: 10),
-                    TextFormField(
-                      controller: productConditionController,
+                    DropdownButtonFormField<ProductCondition>(
                       decoration: const InputDecoration(labelText: 'Condition'),
+                      value: selectedCondition,
+                      onChanged: (ProductCondition? newValue) {
+                        setState(() {
+                          selectedCondition = newValue!;
+                        });
+                      },
+                      items: ProductCondition.values.map((ProductCondition condition) {
+                        return DropdownMenuItem<ProductCondition>(
+                          value: condition,
+                          child: Text(condition.displayName),
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 20),
                     BigButton(
