@@ -28,4 +28,15 @@ class StoreService {
 
     return stores.add(newStore.toMap());
   }
+
+  Future<String> getStoreName(String storeID) async {
+    DocumentSnapshot documentSnapshot =
+    await stores.doc(storeID).get();
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+      return data['storeName'] ?? 'Unknown Store';
+    } else {
+      return 'Unknown Store';
+    }
+  }
 }

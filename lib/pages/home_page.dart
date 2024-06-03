@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/service/auth_service.dart';
+import 'package:fp_ppb/service/product_service.dart';
+import 'package:fp_ppb/service/store_service.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +18,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
   final itemController = TextEditingController();
+  final ProductService productService = ProductService();
+  final StoreService storeService = StoreService();
+  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
 
   void signUserOut() {
     final authService = AuthService();
@@ -50,125 +57,205 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: MyTextField(
-                        controller: itemController,
-                        hintText: "Search...",
-                        obscureText: false,
+      body: StreamBuilder<QuerySnapshot>(
+        stream: productService.getProductStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: MyTextField(
+                              controller: itemController,
+                              hintText: "Search...",
+                              obscureText: false,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.shopping_cart),
+                              ),
+                              IconButton(
+                                onPressed: showSignOutDialog,
+                                icon: const Icon(Icons.logout),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ListUserPage()),
+                              );
+                            },
+                            icon: const Icon(Icons.chat),
+                          ),
+                        ],
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height - 200,
+                        child: const Center(
+                          child: Text('No Product.'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          List productList = snapshot.data!.docs;
+
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 10),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.shopping_cart),
+                        Expanded(
+                          child: MyTextField(
+                            controller: itemController,
+                            hintText: "Search...",
+                            obscureText: false,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(Icons.shopping_cart),
+                            ),
+                            IconButton(
+                              onPressed: showSignOutDialog,
+                              icon: const Icon(Icons.logout),
+                            ),
+                          ],
                         ),
                         IconButton(
-                          onPressed: showSignOutDialog,
-                          icon: const Icon(Icons.logout),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ListUserPage()),
+                            );
+                          },
+                          icon: const Icon(Icons.chat),
                         ),
                       ],
                     ),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ListUserPage()),
+                    const SizedBox(height: 20),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: productList.length,
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.65,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 1,
+                      ),
+                      itemBuilder: (context, index) {
+                        DocumentSnapshot document = productList[index];
+                        String productID = document.id;
+                        Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
+                        String productName = data['productName'];
+                        double productPrice = data['productPrice'];
+                        String storeID = data['storeID'];
+                        String price = formatCurrency.format(productPrice);
+
+                        return GestureDetector(
+                          onTap: () {},
+                          child: Card(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Center(
+                                  child: Icon(
+                                    Icons.keyboard,
+                                    size: 150,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                  child: Text(
+                                    productName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
+                                  child: Text(
+                                    price,
+                                  ),
+                                ),
+                                const Divider(
+                                  thickness: 1.0,
+                                  color: Colors.grey,
+                                ),
+                                FutureBuilder<String>(
+                                  future: storeService.getStoreName(storeID),
+                                  builder: (context, storeSnapshot) {
+                                    if (storeSnapshot.connectionState == ConnectionState.waiting) {
+                                      return const Center(child: CircularProgressIndicator());
+                                    }
+                                    if (storeSnapshot.hasError) {
+                                      return Center(child: Text('Error: ${storeSnapshot.error}'));
+                                    }
+                                    return Padding(
+                                      padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.storefront, size: 16,),
+                                          SizedBox(width: 2,),
+                                          Text(
+                                            storeSnapshot.data ?? 'Unknown Store',
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
-                      icon: const Icon(Icons.chat),
                     ),
                   ],
                 ),
-                const SizedBox(height: 25),
-                const Text(
-                  "Elektronik",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        width: 160,
-                        height: 180,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Elektronik 1',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Icon(
-                              Icons.keyboard,
-                              size: 100,
-                            ),
-                            Text(
-                              "Rp1.000.000",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Card(
-                      color: Colors.white,
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
-                        width: 160,
-                        height: 180,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Elektronik 1',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Icon(
-                              Icons.keyboard,
-                              size: 100,
-                            ),
-                            Text(
-                              "Rp1.000.000",
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
