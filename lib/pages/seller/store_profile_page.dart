@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_ppb/components/small_button.dart';
 import 'package:fp_ppb/components/transparent_button.dart';
 import 'package:fp_ppb/pages/seller/store_product_page.dart';
 import 'package:fp_ppb/pages/seller/store_transaction_page.dart';
-import 'package:fp_ppb/pages/transaction_page.dart';
 
 class StoreProfilePage extends StatefulWidget {
   const StoreProfilePage({super.key});
@@ -15,13 +13,13 @@ class StoreProfilePage extends StatefulWidget {
 }
 
 class _StoreProfilePageState extends State<StoreProfilePage> {
-  late Future<QuerySnapshot> _storeDocuments;
+  late Future<QuerySnapshot> _document;
 
   @override
   void initState() {
     super.initState();
     String uid = FirebaseAuth.instance.currentUser!.uid;
-    _storeDocuments = FirebaseFirestore.instance
+    _document = FirebaseFirestore.instance
         .collection('stores')
         .where('sellerUid', isEqualTo: uid)
         .get();
@@ -35,7 +33,7 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
         backgroundColor: Colors.white,
       ),
       body: FutureBuilder<QuerySnapshot>(
-        future: _storeDocuments,
+        future: _document,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -49,6 +47,7 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
 
           var data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
           String storeName = data['storeName'];
+          String storeID = snapshot.data!.docs.first.id;
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -96,7 +95,9 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Container(
                     decoration: const BoxDecoration(color: Colors.white),
                     child: Padding(
@@ -106,24 +107,28 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           TransparentButton(
-                              onTap: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const StoreProductPage(),
-                                  ),
-                                );
-                              }, msg: 'My Products',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      StoreProductPage(storeID: storeID),
+                                ),
+                              );
+                            },
+                            msg: 'My Products',
                           ),
                           TransparentButton(
-                              onTap: (){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const StoreTransactionPage(),
-                                  ),
-                                );
-                              }, msg: 'Transactions',
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const StoreTransactionPage(),
+                                ),
+                              );
+                            },
+                            msg: 'Transactions',
                           ),
                         ],
                       ),

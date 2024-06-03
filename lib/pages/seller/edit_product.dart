@@ -7,7 +7,10 @@ import 'package:fp_ppb/service/product_service.dart';
 class EditProductPage extends StatefulWidget {
   final String productID;
 
-  const EditProductPage({super.key, required this.productID});
+  final String storeID;
+
+  const EditProductPage(
+      {super.key, required this.productID, required this.storeID});
 
   @override
   State<EditProductPage> createState() => _EditProductPageState();
@@ -16,6 +19,7 @@ class EditProductPage extends StatefulWidget {
 class _EditProductPageState extends State<EditProductPage> {
   late Future<DocumentSnapshot> _document;
   late Timestamp createdAt;
+  late String storeId;
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
   final productCategoryController = TextEditingController();
@@ -36,12 +40,21 @@ class _EditProductPageState extends State<EditProductPage> {
     try {
       await productService.updateProduct(
         widget.productID,
+        widget.storeID,
         productNameController.text,
         productDescriptionController.text,
         productCategoryController.text,
         productPriceController.text,
         productStockController.text,
         productConditionController.text,
+        createdAt,
+      );
+      await productService.updateStoreProduct(
+        widget.productID,
+        widget.storeID,
+        productNameController.text,
+        productPriceController.text,
+        productStockController.text,
         createdAt,
       );
       Navigator.of(context, rootNavigator: true).pop();
@@ -65,8 +78,7 @@ class _EditProductPageState extends State<EditProductPage> {
               ),
             ),
           );
-        },
-    );
+        });
   }
 
   @override
@@ -94,11 +106,15 @@ class _EditProductPageState extends State<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Product", style: TextStyle(color: Colors.white),),
+        title:
+            const Text("Edit Product", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -126,7 +142,8 @@ class _EditProductPageState extends State<EditProductPage> {
                   children: [
                     TextFormField(
                       controller: productNameController,
-                      decoration: const InputDecoration(labelText: 'Product Name'),
+                      decoration:
+                          const InputDecoration(labelText: 'Product Name'),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
@@ -148,7 +165,8 @@ class _EditProductPageState extends State<EditProductPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productDescriptionController,
-                      decoration: const InputDecoration(labelText: 'Description'),
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(

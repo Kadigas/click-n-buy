@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
 import 'package:fp_ppb/service/product_service.dart';
+import 'package:fp_ppb/service/store_service.dart';
 
 class AddProductPage extends StatefulWidget {
-  const AddProductPage({super.key});
+  final String storeID;
+
+  const AddProductPage({super.key, required this.storeID});
 
   @override
   State<AddProductPage> createState() => _AddProductPageState();
@@ -29,13 +33,22 @@ class _AddProductPageState extends State<AddProductPage> {
         });
 
     try {
-      await productService.addProduct(
+      DocumentReference productDocRef = await productService.addProduct(
+        widget.storeID,
         productNameController.text,
         productDescriptionController.text,
         productCategoryController.text,
         productPriceController.text,
         productStockController.text,
         productConditionController.text,
+      );
+      String productId = productDocRef.id;
+      await productService.addStoreProduct(
+        widget.storeID,
+        productId,
+        productNameController.text,
+        productPriceController.text,
+        productStockController.text,
       );
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
@@ -121,7 +134,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
                 const SizedBox(height: 20),
                 BigButton(
-                  onTap: addProduct,
+                  onTap: () => addProduct(),
                   msg: 'Add Product',
                   color: Colors.blueAccent,
                 ),
