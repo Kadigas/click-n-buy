@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/enums/product_category.dart';
+import 'package:fp_ppb/enums/product_condition.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:fp_ppb/service/store_service.dart';
 
@@ -17,10 +19,11 @@ class AddProductPage extends StatefulWidget {
 class _AddProductPageState extends State<AddProductPage> {
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
-  final productCategoryController = TextEditingController();
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
-  final productConditionController = TextEditingController();
+
+  ProductCategory? selectedCategory;
+  ProductCondition? selectedCondition;
 
   void addProduct() async {
     final productService = ProductService();
@@ -37,10 +40,10 @@ class _AddProductPageState extends State<AddProductPage> {
         widget.storeID,
         productNameController.text,
         productDescriptionController.text,
-        productCategoryController.text,
+        selectedCategory.toString().split('.').last,
         productPriceController.text,
         productStockController.text,
-        productConditionController.text,
+        selectedCondition.toString().split('.').last,
       );
       String productId = productDocRef.id;
       await productService.addStoreProduct(
@@ -100,45 +103,69 @@ class _AddProductPageState extends State<AddProductPage> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
-              child: Column(children: [
-                TextFormField(
-                  controller: productNameController,
-                  decoration: const InputDecoration(labelText: 'Product Name'),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: productCategoryController,
-                  decoration: const InputDecoration(labelText: 'Category'),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: productPriceController,
-                  decoration: const InputDecoration(labelText: 'Price'),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: productStockController,
-                  decoration: const InputDecoration(labelText: 'Stock'),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: productDescriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  controller: productConditionController,
-                  decoration: const InputDecoration(labelText: 'Condition'),
-                ),
-                const SizedBox(height: 20),
-                BigButton(
-                  onTap: () => addProduct(),
-                  msg: 'Add Product',
-                  color: Colors.blueAccent,
-                ),
-              ]),
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: productNameController,
+                    decoration: const InputDecoration(labelText: 'Product Name'),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<ProductCategory>(
+                    decoration: const InputDecoration(labelText: 'Category'),
+                    value: selectedCategory,
+                    onChanged: (ProductCategory? newValue) {
+                      setState(() {
+                        selectedCategory = newValue!;
+                      });
+                    },
+                    items: ProductCategory.values.map((ProductCategory category) {
+                      return DropdownMenuItem<ProductCategory>(
+                        value: category,
+                        child: Text(category.displayName),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: productPriceController,
+                    decoration: const InputDecoration(labelText: 'Price'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: productStockController,
+                    decoration: const InputDecoration(labelText: 'Stock'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: productDescriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<ProductCondition>(
+                    decoration: const InputDecoration(labelText: 'Condition'),
+                    value: selectedCondition,
+                    onChanged: (ProductCondition? newValue) {
+                      setState(() {
+                        selectedCondition = newValue!;
+                      });
+                    },
+                    items: ProductCondition.values.map((ProductCondition condition) {
+                      return DropdownMenuItem<ProductCondition>(
+                        value: condition,
+                        child: Text(condition.displayName),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+                  BigButton(
+                    onTap: () => addProduct(),
+                    msg: 'Add Product',
+                    color: Colors.blueAccent,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
