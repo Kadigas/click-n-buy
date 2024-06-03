@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/components/small_button.dart';
+import 'package:fp_ppb/components/transparent_button.dart';
+import 'package:fp_ppb/pages/seller/store_product_page.dart';
+import 'package:fp_ppb/pages/seller/store_transaction_page.dart';
+import 'package:fp_ppb/pages/transaction_page.dart';
 
 class StoreProfilePage extends StatefulWidget {
   const StoreProfilePage({super.key});
@@ -27,7 +32,6 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Store Profile"),
-        centerTitle: true,
         backgroundColor: Colors.white,
       ),
       body: FutureBuilder<QuerySnapshot>(
@@ -92,6 +96,39 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 10,),
+                  Container(
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TransparentButton(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const StoreProductPage(),
+                                  ),
+                                );
+                              }, msg: 'My Products',
+                          ),
+                          TransparentButton(
+                              onTap: (){
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const StoreTransactionPage(),
+                                  ),
+                                );
+                              }, msg: 'Transactions',
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),

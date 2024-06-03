@@ -94,9 +94,9 @@ class _EditProductPageState extends State<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Product"),
+        title: const Text("Edit Product", style: TextStyle(color: Colors.white),),
         centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -109,53 +109,53 @@ class _EditProductPageState extends State<EditProductPage> {
         future: _document,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return Center(child: Text('Document not found'));
+            return const Center(child: Text('Document not found'));
           }
 
           return SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Form(
                 child: Column(
                   children: [
                     TextFormField(
                       controller: productNameController,
-                      decoration: InputDecoration(labelText: 'Product Name'),
+                      decoration: const InputDecoration(labelText: 'Product Name'),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productCategoryController,
-                      decoration: InputDecoration(labelText: 'Category'),
+                      decoration: const InputDecoration(labelText: 'Category'),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productPriceController,
-                      decoration: InputDecoration(labelText: 'Price'),
+                      decoration: const InputDecoration(labelText: 'Price'),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productStockController,
-                      decoration: InputDecoration(labelText: 'Stock'),
+                      decoration: const InputDecoration(labelText: 'Stock'),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productDescriptionController,
-                      decoration: InputDecoration(labelText: 'Description'),
+                      decoration: const InputDecoration(labelText: 'Description'),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productConditionController,
-                      decoration: InputDecoration(labelText: 'Condition'),
+                      decoration: const InputDecoration(labelText: 'Condition'),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     BigButton(
                       onTap: () {
                         editProduct();
