@@ -40,7 +40,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .get();
   }
 
-
   void deleteProduct() async {
     showDialog(
       context: context,

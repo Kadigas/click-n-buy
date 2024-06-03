@@ -10,7 +10,10 @@ class EditProductPage extends StatefulWidget {
   final String productID;
   final String storeID;
 
-  const EditProductPage({super.key, required this.productID, required this.storeID});
+  final String storeID;
+
+  const EditProductPage(
+      {super.key, required this.productID, required this.storeID});
 
   @override
   State<EditProductPage> createState() => _EditProductPageState();
@@ -19,6 +22,7 @@ class EditProductPage extends StatefulWidget {
 class _EditProductPageState extends State<EditProductPage> {
   late Future<DocumentSnapshot> _document;
   late Timestamp createdAt;
+  late String storeId;
   final productNameController = TextEditingController();
   final productDescriptionController = TextEditingController();
   final productPriceController = TextEditingController();
@@ -88,6 +92,14 @@ class _EditProductPageState extends State<EditProductPage> {
         productStockController.text,
         createdAt,
       );
+      await productService.updateStoreProduct(
+        widget.productID,
+        widget.storeID,
+        productNameController.text,
+        productPriceController.text,
+        productStockController.text,
+        createdAt,
+      );
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -137,11 +149,15 @@ class _EditProductPageState extends State<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Product", style: TextStyle(color: Colors.white)),
+        title:
+            const Text("Edit Product", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -169,7 +185,8 @@ class _EditProductPageState extends State<EditProductPage> {
                   children: [
                     TextFormField(
                       controller: productNameController,
-                      decoration: const InputDecoration(labelText: 'Product Name'),
+                      decoration:
+                          const InputDecoration(labelText: 'Product Name'),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<ProductCategory>(
@@ -202,7 +219,8 @@ class _EditProductPageState extends State<EditProductPage> {
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: productDescriptionController,
-                      decoration: const InputDecoration(labelText: 'Description'),
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<ProductCondition>(

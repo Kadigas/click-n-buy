@@ -53,6 +53,14 @@ class _AddProductPageState extends State<AddProductPage> {
         productPriceController.text,
         productStockController.text,
       );
+      String productId = productDocRef.id;
+      await productService.addStoreProduct(
+        widget.storeID,
+        productId,
+        productNameController.text,
+        productPriceController.text,
+        productStockController.text,
+      );
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
