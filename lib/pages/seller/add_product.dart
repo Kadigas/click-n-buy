@@ -53,7 +53,6 @@ class _AddProductPageState extends State<AddProductPage> {
         productPriceController.text,
         productStockController.text,
       );
-      String productId = productDocRef.id;
       await productService.addStoreProduct(
         widget.storeID,
         productId,

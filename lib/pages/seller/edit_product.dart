@@ -10,8 +10,6 @@ class EditProductPage extends StatefulWidget {
   final String productID;
   final String storeID;
 
-  final String storeID;
-
   const EditProductPage(
       {super.key, required this.productID, required this.storeID});
 
