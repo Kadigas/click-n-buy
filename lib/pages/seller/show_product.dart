@@ -9,7 +9,10 @@ import 'package:intl/intl.dart';
 class ShowProductPage extends StatefulWidget {
   final String productID;
 
-  const ShowProductPage({super.key, required this.productID});
+  final String storeID;
+
+  const ShowProductPage(
+      {super.key, required this.productID, required this.storeID});
 
   @override
   State<ShowProductPage> createState() => _ShowProductPageState();
@@ -23,23 +26,28 @@ class _ShowProductPageState extends State<ShowProductPage> {
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() {
     _document = FirebaseFirestore.instance
         .collection('products')
         .doc(widget.productID)
         .get();
   }
 
-  void deleteProduct(String productID) async {
+  void deleteProduct() async {
     showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
     try {
-      await productService.deleteProduct(productID);
+      await productService.deleteProduct(widget.productID);
+      await productService.deleteStoreProduct(widget.storeID, widget.productID);
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
@@ -99,7 +107,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
           String productDescription = data['productDescription'];
           String productCategory = data['productCategory'];
           String productPrice = formatCurrency.format(data['productPrice']);
-          int productStock = data['productStock'];
+          String productStock = data['productStock'].toString();
           String productCondition = data['productCondition'];
 
           return SafeArea(
@@ -149,6 +157,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                       const SizedBox(
                         height: 10,
                       ),
+                      Text('Stock: $productStock'),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,
@@ -171,15 +180,20 @@ class _ShowProductPageState extends State<ShowProductPage> {
                           MyButton(
                             msg: 'Edit Product',
                             color: Colors.black,
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EditProductPage(
-                                          productID: widget.productID)));
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditProductPage(
+                                    productID: widget.productID,
+                                    storeID: widget.storeID,
+                                  ),
+                                ),
+                              );
+                              _fetchData();
                             },
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           MyButton(
@@ -190,30 +204,29 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text('Confirmation'),
-                                    content: Text(
+                                    title: const Text('Confirmation'),
+                                    content: const Text(
                                         'Are you sure you want to proceed?'),
                                     actions: <Widget>[
                                       TextButton(
                                         onPressed: () {
-                                          Navigator.of(context)
-                                              .pop();
+                                          Navigator.of(context).pop();
                                         },
-                                        child: Text('Cancel'),
+                                        child: const Text('Cancel'),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
-                                              .pop(); // Dismiss the dialog
-                                          deleteProduct(widget.productID);
+                                              .pop();
+                                          deleteProduct();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
-                                            SnackBar(
-                                                content:
-                                                    Text('Succeeded delete product!')),
+                                            const SnackBar(
+                                                content: Text(
+                                                    'Succeeded delete product!')),
                                           );
                                         },
-                                        child: Text('Confirm'),
+                                        child: const Text('Confirm'),
                                       ),
                                     ],
                                   );

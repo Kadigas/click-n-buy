@@ -7,12 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/pages/seller/add_product.dart';
-import 'package:fp_ppb/pages/seller/edit_product.dart';
-import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
 class StoreProductPage extends StatefulWidget {
-  const StoreProductPage({super.key});
+  final String storeID;
+
+  const StoreProductPage({super.key, required this.storeID});
 
   @override
   State<StoreProductPage> createState() => _StoreProductPageState();
@@ -29,10 +29,12 @@ class _StoreProductPageState extends State<StoreProductPage> {
 
   void changePrice(String productID, String newPrice) {
     productService.updateProductPrice(productID, newPrice);
+    productService.updateStoreProductPrice(widget.storeID, productID, newPrice);
   }
 
   void changeStock(String productID, String newStock) {
     productService.updateProductStock(productID, newStock);
+    productService.updateStoreProductStock(widget.storeID, productID, newStock);
   }
 
   @override
@@ -54,7 +56,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: productService.getProductStream(),
+        stream: productService.getStoreProductStream(widget.storeID),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -88,8 +90,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const AddProductPage(),
+                                      builder: (context) => AddProductPage(
+                                        storeID: widget.storeID,
+                                      ),
                                     ),
                                   );
                                 },
@@ -151,8 +154,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AddProductPage(),
+                                    builder: (context) => AddProductPage(
+                                      storeID: widget.storeID,
+                                    ),
                                   ),
                                 );
                               },
@@ -195,6 +199,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                               MaterialPageRoute(
                                 builder: (context) => ShowProductPage(
                                   productID: productID,
+                                  storeID: widget.storeID,
                                 ),
                               ),
                             );
@@ -242,6 +247,10 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                   builder: (context) {
                                                     final priceController =
                                                         TextEditingController();
+                                                    priceController.text =
+                                                        productPrice
+                                                            .toInt()
+                                                            .toString();
                                                     return AlertDialog(
                                                       title: const Text(
                                                           'Change Price'),
@@ -257,6 +266,14 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                                     'New Price'),
                                                       ),
                                                       actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: const Text(
+                                                              'Cancel'),
+                                                        ),
                                                         TextButton(
                                                           onPressed: () {
                                                             String newPrice =
@@ -286,6 +303,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                   builder: (context) {
                                                     final stockController =
                                                         TextEditingController();
+                                                    stockController.text =
+                                                        productStock.toString();
                                                     return AlertDialog(
                                                       title: const Text(
                                                           'Change Stock'),
@@ -301,6 +320,14 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                                     'New Stock'),
                                                       ),
                                                       actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: const Text(
+                                                              'Cancel'),
+                                                        ),
                                                         TextButton(
                                                           onPressed: () {
                                                             String newStock =
