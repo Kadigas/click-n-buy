@@ -13,12 +13,38 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
-
   final itemController = TextEditingController();
 
   void signUserOut() {
     final authService = AuthService();
     authService.signOut();
+  }
+
+  void showSignOutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Logout?'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                signUserOut();
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -36,32 +62,35 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Expanded(
                       child: MyTextField(
-                          controller: itemController,
-                          hintText: "Search...",
-                          obscureText: false),
+                        controller: itemController,
+                        hintText: "Search...",
+                        obscureText: false,
+                      ),
                     ),
-                    // const Icon(Icons.search),
                     Row(
                       children: [
                         IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.shopping_cart)),
+                          onPressed: () {},
+                          icon: const Icon(Icons.shopping_cart),
+                        ),
                         IconButton(
-                          onPressed: signUserOut,
+                          onPressed: showSignOutDialog,
                           icon: const Icon(Icons.logout),
                         ),
                       ],
                     ),
                     IconButton(
-                        onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => ListUserPage()));
-                        },
-                        icon: const Icon(Icons.chat)),
-
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ListUserPage()),
+                        );
+                      },
+                      icon: const Icon(Icons.chat),
+                    ),
                   ],
                 ),
-                SizedBox(height: 25),
+                const SizedBox(height: 25),
                 const Text(
                   "Elektronik",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -85,9 +114,10 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               'Elektronik 1',
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Icon(
                               Icons.keyboard,
@@ -117,9 +147,10 @@ class _HomePageState extends State<HomePage> {
                             Text(
                               'Elektronik 1',
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Icon(
                               Icons.keyboard,
@@ -133,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
