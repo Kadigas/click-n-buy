@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fp_ppb/pages/startup_screen.dart';
 import 'firebase_options.dart';
-import 'package:fp_ppb/pages/chat_page.dart';
+import 'package:fp_ppb/pages/chat/chat_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
