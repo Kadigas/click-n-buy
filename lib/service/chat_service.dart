@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fp_ppb/enums/chat_types.dart';
 import 'package:fp_ppb/models/message.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
@@ -16,7 +17,11 @@ class ChatService {
     });
   }
 
-  Future sendMessage(String receiverId, message) async {
+  Future sendMessage(String receiverId, message,
+      {String? type, String? imageLink}) async {
+    type ??= MessageType.text.value;
+    imageLink ??= "";
+
     final currentUser = _auth.getCurrentUser();
 
     final String currentUserId = currentUser!.uid;
@@ -28,7 +33,9 @@ class ChatService {
         senderId: currentUserId,
         senderEmail: currentUserEmail!,
         receiverId: receiverId,
-        timestamp: timestamp);
+        timestamp: timestamp,
+        type: type,
+        imageLink: imageLink);
     List<String> ids = [currentUserId, receiverId];
     ids.sort();
     String chatRoomId = ids.join('_');
@@ -61,24 +68,32 @@ class ChatService {
     await deleteDocumentWithSubcollections('chat_rooms', chatroomId);
   }
 
-  Future<void> deleteDocumentWithSubcollections(String collectionPath, String documentId) async {
+  Future<void> deleteDocumentWithSubcollections(
+      String collectionPath, String documentId) async {
     // Reference to the document
-    var documentReference = FirebaseFirestore.instance.collection(collectionPath).doc(documentId);
+    var documentReference =
+        FirebaseFirestore.instance.collection(collectionPath).doc(documentId);
 
     // List of known subcollections (you need to specify these manually)
-    List<String> subcollections = ['messages', 'attachments']; // Example subcollections
+    List<String> subcollections = [
+      'messages',
+      'attachments'
+    ]; // Example subcollections
 
     // Delete all subcollections
     for (var subcollection in subcollections) {
-      await deleteCollection('$collectionPath/$documentId/$subcollection', batchSize: 10);
+      await deleteCollection('$collectionPath/$documentId/$subcollection',
+          batchSize: 10);
     }
 
     // Delete the document itself
     await documentReference.delete();
   }
 
-  Future<void> deleteCollection(String collectionPath, {int batchSize = 10}) async {
-    var collectionReference = FirebaseFirestore.instance.collection(collectionPath);
+  Future<void> deleteCollection(String collectionPath,
+      {int batchSize = 10}) async {
+    var collectionReference =
+        FirebaseFirestore.instance.collection(collectionPath);
 
     var querySnapshot;
     do {

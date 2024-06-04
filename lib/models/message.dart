@@ -6,8 +6,11 @@ class Message {
   final String receiverId;
   final String message;
   final Timestamp timestamp;
+  final String? type;
+  final String? imageLink;
+  final bool? isDelete;
 
-  Message({required this.message, required this.senderId, required this.senderEmail, required this.receiverId, required this.timestamp});
+  Message({required this.message, required this.senderId, required this.senderEmail, required this.receiverId, required this.timestamp, this.type, this.imageLink, this.isDelete});
 
   Map<String, dynamic> toMap() {
     return {
@@ -15,7 +18,10 @@ class Message {
       'senderEmail': senderEmail,
       'receiverId': receiverId,
       'message': message,
-      'timestamp': timestamp
+      'timestamp': timestamp,
+      'type': type?? "message",
+      'imageLink': imageLink?? "",
+      'isDelete': isDelete?? false
     };
   }
 }

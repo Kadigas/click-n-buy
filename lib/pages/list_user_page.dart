@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fp_ppb/pages/chat_page.dart';
+import 'package:fp_ppb/pages/chat/chat_page.dart';
 
 import '../service/auth_service.dart';
 import '../service/chat_service.dart';
