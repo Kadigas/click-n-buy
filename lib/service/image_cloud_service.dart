@@ -1,10 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:fp_ppb/enums/image_upload_endpoint.dart';
+import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 
-class ImageUploadService {
+class ImageCloudService {
   final ImagePicker _picker = ImagePicker();
   final String uploadEndpoint =
       'http://20.80.233.67:9999'; // Replace with your endpoint URL
@@ -24,12 +26,42 @@ class ImageUploadService {
     }
   }
 
+  Future deleteImageByFilename(String filename) async {
+    try {
+      if (kDebugMode) {
+        print(filename);
+      }
+      String encodedFilename = Uri.encodeComponent(filename);
+
+      var response = await http.delete(
+          Uri.parse(getEndpoint(ImageUploadEndpoint.deleteImageByFilename,
+              arg: encodedFilename)),
+          headers: {
+            HttpHeaders.contentTypeHeader: 'application/json',
+          });
+
+      if (response.statusCode == 200) {
+        if (kDebugMode) {
+          print('Image deleted successfully');
+        }
+      } else {
+        if (kDebugMode) {
+          print('Failed to delete image, status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting image: $e');
+      }
+    }
+  }
+
   Future<String?> uploadImage(XFile image) async {
     try {
       // if want to get the image, put this code to decode string to URL format
       // String encodedFilename = Uri.encodeComponent(image.name);
 
-      print(getEndpoint(ImageUploadEndpoint.uploadImage));
       var request = http.MultipartRequest(
           'POST', Uri.parse(getEndpoint(ImageUploadEndpoint.uploadImage)));
       request.files.add(await http.MultipartFile.fromPath('file', image.path));
@@ -38,7 +70,9 @@ class ImageUploadService {
       if (response.statusCode == 200) {
         var responseData = await response.stream.bytesToString();
         var decodedResponse = jsonDecode(responseData);
-        print("success upload image ${decodedResponse['filename']}");
+        if (kDebugMode) {
+          print("success upload image ${decodedResponse['filename']}");
+        }
         return decodedResponse[
             'filename']; // Assuming the server returns the URL in the 'url' field
       } else {

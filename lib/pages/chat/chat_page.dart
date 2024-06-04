@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:fp_ppb/enums/image_upload_endpoint.dart';
+import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../components/chat/chat_box.dart';
 import '../../service/auth_service.dart';
 import '../../service/chat_service.dart';
-import '../../service/image_upload_service.dart';
+import '../../service/image_cloud_service.dart';
 import '../../enums/chat_types.dart';
 
 class ChatPage extends StatefulWidget {
@@ -28,8 +28,40 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final ChatService chatService = ChatService();
   final AuthService authService = AuthService();
-  final ImageUploadService imageUploadService = ImageUploadService();
+  final ImageCloudService imageUploadService = ImageCloudService();
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController =
+      ScrollController(); // Initialize ScrollController
+
+  bool isEditMode = false;
+  String editedMessageId = "";
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose(); // Dispose the ScrollController
+    super.dispose();
+  }
+
+  void setIsEditMode(String messageText, String messageId) {
+    _messageController.text = messageText;
+    setState(() {
+      editedMessageId = messageId;
+      isEditMode = true;
+    });
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
 
   void sendMessage({String? text, MessageType? type, String? imagePath}) async {
     if (text?.isNotEmpty == true) {
@@ -49,10 +81,17 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
     _messageController.clear();
+    _scrollToBottom();
   }
 
   Future<XFile?> pickImage() async {
     return await imageUploadService.pickImageFromGallery();
+  }
+
+  Future editMessage(
+      String messageId, Map<Object, Object?> editedDataObj) async {
+    await chatService.editMessage(
+        widget.userId, widget.otherUserId, messageId, editedDataObj);
   }
 
   @override
@@ -65,7 +104,8 @@ class _ChatPageState extends State<ChatPage> {
           const Icon(Icons.info),
           IconButton(
             onPressed: () async {
-              await chatService.deleteMessage(widget.userId, widget.otherUserId);
+              await chatService.deleteMessage(
+                  widget.userId, widget.otherUserId);
               Navigator.pop(context);
             },
             icon: const Icon(Icons.delete),
@@ -84,7 +124,8 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: chatService.getMessages(widget.userId, widget.otherUserId),
+                stream:
+                    chatService.getMessages(widget.userId, widget.otherUserId),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text("Error: ${snapshot.error}"));
@@ -96,17 +137,28 @@ class _ChatPageState extends State<ChatPage> {
                     return const Center(child: Text("No messages yet"));
                   }
                   var messages = snapshot.data!.docs.map((doc) {
-                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+                    Map<String, dynamic> data =
+                        doc.data() as Map<String, dynamic>;
                     return ChatBox(
-                      text: data['message'],
-                      isMe: data['senderId'] == authService.getCurrentUser()!.uid,
-                      timestamp: data['timestamp'].toDate(),
-                      imageUrl: data['imageLink'],
-                      messageType: data['type'] == 'image' ? MessageType.image : MessageType.text,
-                    );
+                        text: data['message'],
+                        isMe: data['senderId'] ==
+                            authService.getCurrentUser()!.uid,
+                        timestamp: data['timestamp'].toDate(),
+                        imageUrl: data['imageLink'],
+                        messageType: data['type'] == 'image'
+                            ? MessageType.image
+                            : MessageType.text,
+                        idMessage: doc.id,
+                        editMessage: editMessage,
+                        isDelete: data['isDelete'],
+                        isEdit: data['isEdit'],
+                        setIsEditMode: setIsEditMode);
                   }).toList();
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _scrollToBottom());
                   return ListView(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 10),
                     children: messages,
                   );
                 },
@@ -126,11 +178,13 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.photo),
+            icon: const Icon(Icons.photo),
             onPressed: () async {
               XFile? image = await pickImage();
               String? filename = await imageUploadService.uploadImage(image!);
-              String imageUrl = imageUploadService.getEndpoint(ImageUploadEndpoint.getImageByFilename, arg: filename);
+              String imageUrl = imageUploadService.getEndpoint(
+                  ImageUploadEndpoint.getImageByFilename,
+                  arg: filename);
               if (image != null) {
                 sendMessage(type: MessageType.image, imagePath: imageUrl);
               }
@@ -147,9 +201,9 @@ class _ChatPageState extends State<ChatPage> {
                   borderRadius: BorderRadius.circular(25),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
-              onSubmitted: (_) => sendMessage(text: _messageController.text),
             ),
           ),
           const SizedBox(width: 8),
@@ -158,7 +212,18 @@ class _ChatPageState extends State<ChatPage> {
             backgroundColor: Colors.orangeAccent,
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
-              onPressed: () => sendMessage(text: _messageController.text),
+              onPressed: () async {
+                if (!isEditMode) {
+                  sendMessage(text: _messageController.text);
+                } else {
+                  await editMessage(editedMessageId,
+                      {'message': _messageController.text, 'isEdit': true});
+                  _messageController.clear();
+                  setState(() {
+                    isEditMode = false;
+                  });
+                }
+              },
             ),
           ),
         ],

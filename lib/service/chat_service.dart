@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fp_ppb/enums/chat_types.dart';
 import 'package:fp_ppb/models/message.dart';
 import 'package:fp_ppb/service/auth_service.dart';
@@ -58,6 +59,54 @@ class ChatService {
         .collection("messages")
         .orderBy("timestamp", descending: false)
         .snapshots();
+  }
+
+  String getUserRoomId(String userId, String otherUserId) {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    String chatRoomId = ids.join('_');
+    return chatRoomId;
+  }
+
+  Future<void> editMessage(String userId, String otherUserId, String messageId,
+      Map<Object, Object?> editedDataObj) async {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    String chatRoomId = ids.join('_');
+    try {
+      await _firestore
+          .collection('chat_rooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .doc(messageId)
+          .update(editedDataObj);
+      if (kDebugMode) {
+        print('Message edited $messageId successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error editing message: $e');
+      }
+    }
+  }
+
+  Future<void> deleteMessageInChatRoom(
+      String userId, String otherUserId, String messageId) async {
+    List<String> ids = [userId, otherUserId];
+    ids.sort();
+    String chatRoomId = ids.join('_');
+    try {
+      await _firestore
+          .collection('chat_rooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .doc(messageId)
+          .delete();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting message: $e');
+      }
+    }
   }
 
   Future<void> deleteMessage(String userId, String otherUserId) async {
