@@ -1,11 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
 import 'package:fp_ppb/service/enum_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
+
+import '../components/image_product.dart';
 
 class ShowProductPage extends StatefulWidget {
   final String productID;
@@ -87,6 +91,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
               snapshot.data!.data() as Map<String, dynamic>;
           String productName = data['productName'];
           String productDescription = data['productDescription'];
+          String? imageUrl = data['imageUrl'];
           ProductCategory productCategory =
               enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
@@ -103,12 +108,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Center(
-                        child: Icon(
-                          Icons.keyboard,
-                          size: 250,
-                        ),
-                      ),
+                      Center(child: ImageProduct(imageUrl: imageUrl)),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,

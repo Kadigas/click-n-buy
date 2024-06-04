@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/pages/show_product.dart';
@@ -174,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: productList.length,
                       gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.59,
                         crossAxisSpacing: 10,
@@ -184,10 +186,11 @@ class _HomePageState extends State<HomePage> {
                         DocumentSnapshot document = productList[index];
                         String productID = document.id;
                         Map<String, dynamic> data =
-                        document.data() as Map<String, dynamic>;
+                            document.data() as Map<String, dynamic>;
                         String productName = data['productName'];
                         double productPrice = data['productPrice'];
                         String storeID = data['storeID'];
+                        String? imageUrl = data['imageUrl'];
                         String price = formatCurrency.format(productPrice);
 
                         return GestureDetector(
@@ -206,14 +209,11 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Center(
-                                  child: Icon(
-                                    Icons.keyboard,
-                                    size: 150,
-                                  ),
-                                ),
+                                Expanded(
+                                    child: ImageProduct(imageUrl: imageUrl)),
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 5, 5, 5),
                                   child: Text(
                                     productName,
                                     style: const TextStyle(
@@ -223,7 +223,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(10, 2, 2, 2),
                                   child: Text(
                                     price,
                                   ),
@@ -235,20 +236,31 @@ class _HomePageState extends State<HomePage> {
                                 FutureBuilder<String>(
                                   future: storeService.getStoreName(storeID),
                                   builder: (context, storeSnapshot) {
-                                    if (storeSnapshot.connectionState == ConnectionState.waiting) {
-                                      return const Center(child: CircularProgressIndicator());
+                                    if (storeSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
                                     }
                                     if (storeSnapshot.hasError) {
-                                      return Center(child: Text('Error: ${storeSnapshot.error}'));
+                                      return Center(
+                                          child: Text(
+                                              'Error: ${storeSnapshot.error}'));
                                     }
                                     return Padding(
-                                      padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 2, 2, 2),
                                       child: Row(
                                         children: [
-                                          Icon(Icons.storefront, size: 16,),
-                                          SizedBox(width: 2,),
+                                          Icon(
+                                            Icons.storefront,
+                                            size: 16,
+                                          ),
+                                          SizedBox(
+                                            width: 2,
+                                          ),
                                           Text(
-                                            storeSnapshot.data ?? 'Unknown Store',
+                                            storeSnapshot.data ??
+                                                'Unknown Store',
                                           ),
                                         ],
                                       ),
