@@ -176,9 +176,9 @@ class _HomePageState extends State<HomePage> {
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.65,
+                        childAspectRatio: 0.59,
                         crossAxisSpacing: 10,
-                        mainAxisSpacing: 1,
+                        mainAxisSpacing: 10,
                       ),
                       itemBuilder: (context, index) {
                         DocumentSnapshot document = productList[index];
