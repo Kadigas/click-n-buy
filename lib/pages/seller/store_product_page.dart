@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/my_button.dart';
+import 'package:fp_ppb/components/small_button.dart';
 import 'package:fp_ppb/pages/seller/store_show_product.dart';
 import 'package:intl/intl.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
@@ -211,7 +212,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                   padding: EdgeInsets.all(8.0),
                                   child: Icon(
                                     Icons.keyboard,
-                                    size: 50,
+                                    size: 100,
                                   ),
                                 ),
                                 Expanded(
@@ -238,7 +239,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
                                           children: [
-                                            MyButton(
+                                            SmallButton(
                                               msg: 'Change Price',
                                               color: Colors.black,
                                               onTap: () {
@@ -294,7 +295,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                 );
                                               },
                                             ),
-                                            MyButton(
+                                            SmallButton(
                                               msg: 'Change Stock',
                                               color: Colors.black,
                                               onTap: () {
@@ -349,6 +350,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                               },
                                             ),
                                           ],
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
                                         ),
                                       ],
                                     ),

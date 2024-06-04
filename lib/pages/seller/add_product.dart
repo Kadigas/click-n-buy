@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
+import 'package:fp_ppb/service/image_cloud_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
-import 'package:fp_ppb/service/store_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AddProductPage extends StatefulWidget {
   final String storeID;
@@ -21,11 +23,12 @@ class _AddProductPageState extends State<AddProductPage> {
   final productDescriptionController = TextEditingController();
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
-
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
+  final ImageCloudService imageUploadService = ImageCloudService();
 
-  void addProduct() async {
+
+  void addProduct(String? imageUrl) async {
     final productService = ProductService();
     showDialog(
         context: context,
@@ -44,6 +47,7 @@ class _AddProductPageState extends State<AddProductPage> {
         productPriceController.text,
         productStockController.text,
         selectedCondition.toString().split('.').last,
+        imageUrl,
       );
       String productId = productDocRef.id;
       await productService.addStoreProduct(
@@ -52,13 +56,7 @@ class _AddProductPageState extends State<AddProductPage> {
         productNameController.text,
         productPriceController.text,
         productStockController.text,
-      );
-      await productService.addStoreProduct(
-        widget.storeID,
-        productId,
-        productNameController.text,
-        productPriceController.text,
-        productStockController.text,
+        imageUrl,
       );
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pop(context);
@@ -66,6 +64,10 @@ class _AddProductPageState extends State<AddProductPage> {
       Navigator.pop(context);
       showErrorMessage(e.code);
     }
+  }
+
+  Future<XFile?> pickImage() async {
+    return await imageUploadService.pickImageFromGallery();
   }
 
   void showErrorMessage(String message) {
@@ -86,6 +88,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? imageUrl;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -112,6 +115,17 @@ class _AddProductPageState extends State<AddProductPage> {
             child: Form(
               child: Column(
                 children: [
+                  IconButton(
+                    icon: const Icon(Icons.photo, size: 100,),
+                    onPressed: () async {
+                      XFile? image = await pickImage();
+                      String? filename =
+                      await imageUploadService.uploadImage(image!);
+                      imageUrl = imageUploadService.getEndpoint(
+                          ImageUploadEndpoint.getImageByFilename,
+                          arg: filename);
+                    },
+                  ),
                   TextFormField(
                     controller: productNameController,
                     decoration: const InputDecoration(labelText: 'Product Name'),
@@ -167,7 +181,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   ),
                   const SizedBox(height: 20),
                   BigButton(
-                    onTap: () => addProduct(),
+                    onTap: () => addProduct(imageUrl),
                     msg: 'Add Product',
                     color: Colors.blueAccent,
                   ),

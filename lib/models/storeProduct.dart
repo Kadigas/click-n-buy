@@ -4,6 +4,7 @@ class StoreProduct {
   final String productName;
   final double productPrice;
   final int productStock;
+  final String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -11,6 +12,7 @@ class StoreProduct {
     required this.productName,
     required this.productPrice,
     required this.productStock,
+    this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -20,6 +22,7 @@ class StoreProduct {
       'productName': productName,
       'productPrice': productPrice,
       'productStock': productStock,
+      'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
