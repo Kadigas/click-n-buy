@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
@@ -30,6 +31,7 @@ class _EditProductPageState extends State<EditProductPage> {
   final productStockController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
+  String? imageUrl;
   final ImageCloudService imageUploadService = ImageCloudService();
 
   ProductCategory? getCategoryFromString(String category) {
@@ -64,15 +66,20 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
+  void _loadingState() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
   void editProduct(String? imageUrl) async {
     final productService = ProductService();
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+    _loadingState();
 
     try {
       await productService.updateProduct(
@@ -140,6 +147,7 @@ class _EditProductPageState extends State<EditProductPage> {
         productStockController.text = data['productStock'].toString();
         selectedCategory = getCategoryFromString(data['productCategory']);
         selectedCondition = getConditionFromString(data['productCondition']);
+        imageUrl = data['imageUrl'];
         createdAt = data['createdAt'];
       }
     });
@@ -177,25 +185,73 @@ class _EditProductPageState extends State<EditProductPage> {
             return const Center(child: Text('Document not found'));
           }
 
-          String? imageUrl;
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 child: Column(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.photo, size: 100,),
-                      onPressed: () async {
-                        XFile? image = await pickImage();
-                        String? filename =
-                            await imageUploadService.uploadImage(image!);
-                        imageUrl = imageUploadService.getEndpoint(
-                            ImageUploadEndpoint.getImageByFilename,
-                            arg: filename);
-                      },
-                    ),
+                    imageUrl != null
+                        ? Column(
+                            children: [
+                              Stack(
+                                children: [
+                                  Center(
+                                    child: SizedBox(
+                                      width: 200,
+                                      child: ImageProduct(imageUrl: imageUrl),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: -12,
+                                    right: 68,
+                                    child: IconButton(
+                                      icon: const Icon(Icons.close_rounded),
+                                      onPressed: () {
+                                        setState(
+                                          () {
+                                            imageUrl = null;
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.add_photo_alternate,
+                                  size: 180,
+                                ),
+                                onPressed: () async {
+                                  XFile? image = await pickImage();
+                                  if (image != null) {
+                                    _loadingState();
+                                    String? filename = await imageUploadService
+                                        .uploadImage(image!);
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+                                    setState(
+                                      () {
+                                        imageUrl =
+                                            imageUploadService.getEndpoint(
+                                                ImageUploadEndpoint
+                                                    .getImageByFilename,
+                                                arg: filename);
+                                      },
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                     TextFormField(
                       controller: productNameController,
                       decoration:

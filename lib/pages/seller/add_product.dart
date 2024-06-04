@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
@@ -26,17 +27,22 @@ class _AddProductPageState extends State<AddProductPage> {
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
   final ImageCloudService imageUploadService = ImageCloudService();
+  String? imageUrl;
 
+  void _loadingState() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
 
   void addProduct(String? imageUrl) async {
     final productService = ProductService();
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+    _loadingState();
 
     try {
       DocumentReference productDocRef = await productService.addProduct(
@@ -88,7 +94,6 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    String? imageUrl;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -115,20 +120,70 @@ class _AddProductPageState extends State<AddProductPage> {
             child: Form(
               child: Column(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.photo, size: 100,),
-                    onPressed: () async {
-                      XFile? image = await pickImage();
-                      String? filename =
-                      await imageUploadService.uploadImage(image!);
-                      imageUrl = imageUploadService.getEndpoint(
-                          ImageUploadEndpoint.getImageByFilename,
-                          arg: filename);
-                    },
-                  ),
+                  imageUrl != null
+                      ? Column(
+                          children: [
+                            Stack(
+                              children: [
+                                Center(
+                                  child: SizedBox(
+                                    width: 200,
+                                    child: ImageProduct(imageUrl: imageUrl),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: -12,
+                                  right: 68,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.close_rounded),
+                                    onPressed: () {
+                                      setState(
+                                        () {
+                                          imageUrl = null;
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.add_photo_alternate,
+                                size: 180,
+                              ),
+                              onPressed: () async {
+                                XFile? image = await pickImage();
+                                if (image != null) {
+                                  _loadingState();
+                                  String? filename = await imageUploadService
+                                      .uploadImage(image!);
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                  setState(
+                                    () {
+                                      imageUrl = imageUploadService.getEndpoint(
+                                          ImageUploadEndpoint
+                                              .getImageByFilename,
+                                          arg: filename);
+                                    },
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
                   TextFormField(
                     controller: productNameController,
-                    decoration: const InputDecoration(labelText: 'Product Name'),
+                    decoration:
+                        const InputDecoration(labelText: 'Product Name'),
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<ProductCategory>(
@@ -139,7 +194,8 @@ class _AddProductPageState extends State<AddProductPage> {
                         selectedCategory = newValue!;
                       });
                     },
-                    items: ProductCategory.values.map((ProductCategory category) {
+                    items:
+                        ProductCategory.values.map((ProductCategory category) {
                       return DropdownMenuItem<ProductCategory>(
                         value: category,
                         child: Text(category.displayName),
@@ -172,7 +228,8 @@ class _AddProductPageState extends State<AddProductPage> {
                         selectedCondition = newValue!;
                       });
                     },
-                    items: ProductCondition.values.map((ProductCondition condition) {
+                    items: ProductCondition.values
+                        .map((ProductCondition condition) {
                       return DropdownMenuItem<ProductCondition>(
                         value: condition,
                         child: Text(condition.displayName),
