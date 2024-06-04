@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
-import 'package:fp_ppb/pages/seller/edit_product.dart';
 import 'package:fp_ppb/service/enum_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
@@ -38,26 +36,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .collection('products')
         .doc(widget.productID)
         .get();
-  }
-
-  void deleteProduct() async {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
-    try {
-      await productService.deleteProduct(widget.productID);
-      await productService.deleteStoreProduct(widget.storeID, widget.productID);
-      Navigator.of(context, rootNavigator: true).pop();
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showErrorMessage(e.code);
-    }
   }
 
   void showErrorMessage(String message) {
@@ -109,10 +87,11 @@ class _ShowProductPageState extends State<ShowProductPage> {
               snapshot.data!.data() as Map<String, dynamic>;
           String productName = data['productName'];
           String productDescription = data['productDescription'];
-          ProductCategory productCategory = enumService.parseProductCategory(data['productCategory']);
+          ProductCategory productCategory =
+              enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
-          String productStock = data['productStock'].toString();
-          ProductCondition productCondition = enumService.parseProductCondition(data['productCondition']);
+          ProductCondition productCondition =
+              enumService.parseProductCondition(data['productCondition']);
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -143,11 +122,18 @@ class _ShowProductPageState extends State<ShowProductPage> {
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      Text(productName),
+                      Text(
+                        productName,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
                       const SizedBox(height: 10),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 10,
                       ),
                       const Text(
                         'Product Details',
@@ -161,10 +147,12 @@ class _ShowProductPageState extends State<ShowProductPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text('Stock: $productStock'),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 10,
                       ),
                       const Text(
                         'Product Description',
@@ -182,61 +170,17 @@ class _ShowProductPageState extends State<ShowProductPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           MyButton(
-                            msg: 'Edit Product',
+                            msg: 'Add to Cart',
                             color: Colors.black,
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditProductPage(
-                                    productID: widget.productID,
-                                    storeID: widget.storeID,
-                                  ),
-                                ),
-                              );
-                              _fetchData();
-                            },
+                            onTap: () {},
                           ),
                           const SizedBox(
                             width: 10,
                           ),
                           MyButton(
-                            msg: 'Delete Product',
-                            color: Colors.red,
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmation'),
-                                    content: const Text(
-                                        'Are you sure you want to proceed?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context)
-                                              .pop();
-                                          deleteProduct();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Succeeded delete product!')),
-                                          );
-                                        },
-                                        child: const Text('Confirm'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
+                            msg: 'Buy Now',
+                            color: Colors.green,
+                            onTap: () {},
                           ),
                         ],
                       ),
