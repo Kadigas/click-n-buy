@@ -2,9 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
+import 'package:fp_ppb/service/image_cloud_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProductPage extends StatefulWidget {
   final String productID;
@@ -27,6 +30,7 @@ class _EditProductPageState extends State<EditProductPage> {
   final productStockController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
+  final ImageCloudService imageUploadService = ImageCloudService();
 
   ProductCategory? getCategoryFromString(String category) {
     switch (category) {
@@ -60,7 +64,7 @@ class _EditProductPageState extends State<EditProductPage> {
     }
   }
 
-  void editProduct() async {
+  void editProduct(String? imageUrl) async {
     final productService = ProductService();
     showDialog(
         context: context,
@@ -80,6 +84,7 @@ class _EditProductPageState extends State<EditProductPage> {
         productPriceController.text,
         productStockController.text,
         selectedCondition.toString().split('.').last,
+        imageUrl,
         createdAt,
       );
       await productService.updateStoreProduct(
@@ -88,14 +93,7 @@ class _EditProductPageState extends State<EditProductPage> {
         productNameController.text,
         productPriceController.text,
         productStockController.text,
-        createdAt,
-      );
-      await productService.updateStoreProduct(
-        widget.productID,
-        widget.storeID,
-        productNameController.text,
-        productPriceController.text,
-        productStockController.text,
+        imageUrl,
         createdAt,
       );
       Navigator.of(context, rootNavigator: true).pop();
@@ -104,6 +102,10 @@ class _EditProductPageState extends State<EditProductPage> {
       Navigator.pop(context);
       showErrorMessage(e.code);
     }
+  }
+
+  Future<XFile?> pickImage() async {
+    return await imageUploadService.pickImageFromGallery();
   }
 
   void showErrorMessage(String message) {
@@ -175,12 +177,25 @@ class _EditProductPageState extends State<EditProductPage> {
             return const Center(child: Text('Document not found'));
           }
 
+          String? imageUrl;
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 child: Column(
                   children: [
+                    IconButton(
+                      icon: const Icon(Icons.photo, size: 100,),
+                      onPressed: () async {
+                        XFile? image = await pickImage();
+                        String? filename =
+                            await imageUploadService.uploadImage(image!);
+                        imageUrl = imageUploadService.getEndpoint(
+                            ImageUploadEndpoint.getImageByFilename,
+                            arg: filename);
+                      },
+                    ),
                     TextFormField(
                       controller: productNameController,
                       decoration:
@@ -195,7 +210,8 @@ class _EditProductPageState extends State<EditProductPage> {
                           selectedCategory = newValue!;
                         });
                       },
-                      items: ProductCategory.values.map((ProductCategory category) {
+                      items: ProductCategory.values
+                          .map((ProductCategory category) {
                         return DropdownMenuItem<ProductCategory>(
                           value: category,
                           child: Text(category.displayName),
@@ -229,7 +245,8 @@ class _EditProductPageState extends State<EditProductPage> {
                           selectedCondition = newValue!;
                         });
                       },
-                      items: ProductCondition.values.map((ProductCondition condition) {
+                      items: ProductCondition.values
+                          .map((ProductCondition condition) {
                         return DropdownMenuItem<ProductCondition>(
                           value: condition,
                           child: Text(condition.displayName),
@@ -239,7 +256,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     const SizedBox(height: 20),
                     BigButton(
                       onTap: () {
-                        editProduct();
+                        editProduct(imageUrl);
                       },
                       color: Colors.blueAccent,
                       msg: 'Save Changes',

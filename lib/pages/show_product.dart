@@ -109,10 +109,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Center(child: ImageProduct(imageUrl: imageUrl)),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
                       const SizedBox(
                         height: 10,
                       ),

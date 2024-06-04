@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
@@ -112,6 +113,7 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
           ProductCategory productCategory = enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
           String productStock = data['productStock'].toString();
+          String? imageUrl = data['imageUrl'];
           ProductCondition productCondition = enumService.parseProductCondition(data['productCondition']);
 
           return SafeArea(
@@ -124,16 +126,7 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Center(
-                        child: Icon(
-                          Icons.keyboard,
-                          size: 250,
-                        ),
-                      ),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
+                      Center(child: ImageProduct(imageUrl: imageUrl)),
                       const SizedBox(
                         height: 10,
                       ),

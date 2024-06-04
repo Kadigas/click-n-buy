@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/list_user_page.dart';
@@ -178,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.59,
+                        childAspectRatio: 0.56,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -208,17 +209,19 @@ class _HomePageState extends State<HomePage> {
                           child: Card(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Expanded(
-                                    child: ImageProduct(imageUrl: imageUrl)),
+                                  child: ImageProduct(imageUrl: imageUrl),
+                                ),
                                 Padding(
                                   padding:
-                                      const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                      const EdgeInsets.fromLTRB(10, 10, 5, 5),
                                   child: Text(
                                     productName,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16.0,
                                     ),
                                   ),
                                 ),
@@ -227,12 +230,13 @@ class _HomePageState extends State<HomePage> {
                                       const EdgeInsets.fromLTRB(10, 2, 2, 2),
                                   child: Text(
                                     price,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16.0,
+                                    ),
                                   ),
                                 ),
-                                const Divider(
-                                  thickness: 1.0,
-                                  color: Colors.grey,
-                                ),
+                                const SizedBox(height: 10,),
                                 FutureBuilder<String>(
                                   future: storeService.getStoreName(storeID),
                                   builder: (context, storeSnapshot) {
@@ -251,11 +255,11 @@ class _HomePageState extends State<HomePage> {
                                           10, 2, 2, 2),
                                       child: Row(
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.storefront,
                                             size: 16,
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 2,
                                           ),
                                           Text(
@@ -267,6 +271,9 @@ class _HomePageState extends State<HomePage> {
                                     );
                                   },
                                 ),
+                                const SizedBox(
+                                  height: 10,
+                                )
                               ],
                             ),
                           ),
