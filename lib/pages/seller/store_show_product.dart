@@ -110,11 +110,13 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
               snapshot.data!.data() as Map<String, dynamic>;
           String productName = data['productName'];
           String productDescription = data['productDescription'];
-          ProductCategory productCategory = enumService.parseProductCategory(data['productCategory']);
+          ProductCategory productCategory =
+              enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
           String productStock = data['productStock'].toString();
           String? imageUrl = data['imageUrl'];
-          ProductCondition productCondition = enumService.parseProductCondition(data['productCondition']);
+          ProductCondition productCondition =
+              enumService.parseProductCondition(data['productCondition']);
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -135,29 +137,50 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                         style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 10),
-                      Text(productName),
-                      const SizedBox(height: 10),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        productName,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 5,
                       ),
                       const Text(
                         'Product Details',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Text('Category: ${productCategory.displayName}'),
-                      const SizedBox(height: 10),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       Text('Condition: ${productCondition.displayName}'),
                       const SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       Text('Stock: $productStock'),
+                      const SizedBox(
+                        height: 5,
+                      ),
                       const Divider(
                         thickness: 1.0,
                         color: Colors.grey,
+                      ),
+                      const SizedBox(
+                        height: 5,
                       ),
                       const Text(
                         'Product Description',
@@ -165,11 +188,11 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                             fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       Text(productDescription),
                       const SizedBox(
-                        height: 50,
+                        height: 35,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -213,8 +236,7 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                                       ),
                                       TextButton(
                                         onPressed: () {
-                                          Navigator.of(context)
-                                              .pop();
+                                          Navigator.of(context).pop();
                                           deleteProduct();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
