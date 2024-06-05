@@ -172,6 +172,14 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 20),
+                    const Text(
+                      'Featured Products',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -236,7 +244,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 10,),
+                                const SizedBox(
+                                  height: 10,
+                                ),
                                 FutureBuilder<String>(
                                   future: storeService.getStoreName(storeID),
                                   builder: (context, storeSnapshot) {
@@ -279,6 +289,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(
+                      height: 30,
                     ),
                   ],
                 ),
