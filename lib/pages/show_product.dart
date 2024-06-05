@@ -13,7 +13,6 @@ import '../components/image_product.dart';
 
 class ShowProductPage extends StatefulWidget {
   final String productID;
-
   final String storeID;
 
   const ShowProductPage(
@@ -25,6 +24,7 @@ class ShowProductPage extends StatefulWidget {
 
 class _ShowProductPageState extends State<ShowProductPage> {
   late Future<DocumentSnapshot> _document;
+  late Future<DocumentSnapshot> _storeDocument;
   final ProductService productService = ProductService();
   final EnumService enumService = EnumService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
@@ -39,6 +39,10 @@ class _ShowProductPageState extends State<ShowProductPage> {
     _document = FirebaseFirestore.instance
         .collection('products')
         .doc(widget.productID)
+        .get();
+    _storeDocument = FirebaseFirestore.instance
+        .collection('stores')
+        .doc(widget.storeID)
         .get();
   }
 
@@ -98,80 +102,173 @@ class _ShowProductPageState extends State<ShowProductPage> {
           ProductCondition productCondition =
               enumService.parseProductCondition(data['productCondition']);
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(child: ImageProduct(imageUrl: imageUrl)),
-                      const SizedBox(
-                        height: 10,
+          return FutureBuilder<DocumentSnapshot>(
+            future: _storeDocument,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Center(child: Text('Document not found'));
+              }
+
+              Map<String, dynamic> data =
+                  snapshot.data!.data() as Map<String, dynamic>;
+              String storeName = data['storeName'];
+
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 80.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 25.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Center(
+                                      child: ImageProduct(imageUrl: imageUrl)),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    productPrice,
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    productName,
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Divider(
+                                    thickness: 1.0,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Text(
+                                    'Product Details',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                      'Category: ${productCategory.displayName}'),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                      'Condition: ${productCondition.displayName}'),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Divider(
+                                    thickness: 1.0,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  const Text(
+                                    'Product Description',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(productDescription),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Container(
+                            color: Colors.white,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                  25.0, 25.0, 25.0, 25),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.account_circle,
+                                    size: 50,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    storeName,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                        ],
                       ),
-                      Text(
-                        productPrice,
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        productName,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'Product Details',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Text('Category: ${productCategory.displayName}'),
-                      const SizedBox(height: 10),
-                      Text('Condition: ${productCondition.displayName}'),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'Product Description',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(productDescription),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      Row(
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 10,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 1),
+                            decoration: BoxDecoration(
+                                color: Colors.transparent,
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Center(
+                                child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.message))),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
                           MyButton(
                             msg: 'Add to Cart',
                             color: Colors.black,
                             onTap: () {},
                           ),
                           const SizedBox(
-                            width: 10,
+                            width: 5,
                           ),
                           MyButton(
                             msg: 'Buy Now',
@@ -180,11 +277,11 @@ class _ShowProductPageState extends State<ShowProductPage> {
                           ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
+                ],
+              );
+            },
           );
         },
       ),

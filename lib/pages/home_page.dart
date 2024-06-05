@@ -185,9 +185,9 @@ class _HomePageState extends State<HomePage> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: productList.length,
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.56,
+                        childAspectRatio: 0.55,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                         DocumentSnapshot document = productList[index];
                         String productID = document.id;
                         Map<String, dynamic> data =
-                            document.data() as Map<String, dynamic>;
+                        document.data() as Map<String, dynamic>;
                         String productName = data['productName'];
                         double productPrice = data['productPrice'];
                         String storeID = data['storeID'];
@@ -215,71 +215,96 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           child: Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            child: Stack(
                               children: [
-                                Expanded(
-                                  child: ImageProduct(imageUrl: imageUrl),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 10, 5, 5),
-                                  child: Text(
-                                    productName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16.0,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Center(
+                                          child: ImageProduct(imageUrl: imageUrl),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 2, 2, 2),
-                                  child: Text(
-                                    price,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16.0,
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 10, 5, 5),
+                                      child: Text(
+                                        productName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                FutureBuilder<String>(
-                                  future: storeService.getStoreName(storeID),
-                                  builder: (context, storeSnapshot) {
-                                    if (storeSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                          child: CircularProgressIndicator());
-                                    }
-                                    if (storeSnapshot.hasError) {
-                                      return Center(
-                                          child: Text(
-                                              'Error: ${storeSnapshot.error}'));
-                                    }
-                                    return Padding(
+                                    Padding(
                                       padding: const EdgeInsets.fromLTRB(
                                           10, 2, 2, 2),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.storefront,
-                                            size: 16,
-                                          ),
-                                          const SizedBox(
-                                            width: 2,
-                                          ),
-                                          Text(
-                                            storeSnapshot.data ??
-                                                'Unknown Store',
-                                          ),
-                                        ],
+                                      child: Text(
+                                        price,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16.0,
+                                        ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    FutureBuilder<String>(
+                                      future:
+                                      storeService.getStoreName(storeID),
+                                      builder: (context, storeSnapshot) {
+                                        if (storeSnapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                              child:
+                                              CircularProgressIndicator());
+                                        }
+                                        if (storeSnapshot.hasError) {
+                                          return Center(
+                                              child: Text(
+                                                  'Error: ${storeSnapshot.error}'));
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 2, 2, 2),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.storefront,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(
+                                                width: 2,
+                                              ),
+                                              Text(
+                                                storeSnapshot.data ??
+                                                    'Unknown Store',
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(
+                                      height: 35,
+                                    ),
+                                  ],
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.more_horiz),
+                                  ),
                                 ),
                                 const SizedBox(
                                   height: 10,
