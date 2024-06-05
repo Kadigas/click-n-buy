@@ -185,6 +185,8 @@ class _EditProductPageState extends State<EditProductPage> {
             return const Center(child: Text('Document not found'));
           }
 
+          String? imageUrl;
+
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),

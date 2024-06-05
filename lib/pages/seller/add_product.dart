@@ -94,6 +94,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? imageUrl;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
