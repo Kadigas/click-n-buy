@@ -136,8 +136,12 @@ class _ShowProductPageState extends State<ShowProductPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Center(
-                                      child: ImageProduct(imageUrl: imageUrl)),
+                                  SizedBox(
+                                    width: 380,
+                                    height: 300,
+                                    child: Center(
+                                        child: ImageProduct(imageUrl: imageUrl)),
+                                  ),
                                   const SizedBox(
                                     height: 10,
                                   ),

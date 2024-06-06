@@ -32,6 +32,7 @@ class ProductService {
         productPrice: double.parse(productPrice),
         productStock: int.parse(productStock),
         productCondition: productCondition,
+        imageUrl: imageUrl ?? "",
         createdAt: timestamp,
         updatedAt: timestamp);
 
