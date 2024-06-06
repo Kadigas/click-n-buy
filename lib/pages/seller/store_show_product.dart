@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 
 class StoreShowProductPage extends StatefulWidget {
   final String productID;
-
   final String storeID;
 
   const StoreShowProductPage(
@@ -118,153 +117,127 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
           ProductCondition productCondition =
               enumService.parseProductCondition(data['productCondition']);
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Container(
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Padding(
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 380,
+                      height: 300,
+                      child: Center(child: ImageProduct(imageUrl: imageUrl)),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      productPrice,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      productName,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 5),
+                    const Divider(thickness: 1.0, color: Colors.grey),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Product Details',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text('Category: ${productCategory.displayName}'),
+                    const SizedBox(height: 5),
+                    Text('Condition: ${productCondition.displayName}'),
+                    const SizedBox(height: 5),
+                    Text('Stock: $productStock'),
+                    const SizedBox(height: 5),
+                    const Divider(thickness: 1.0, color: Colors.grey),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Product Description',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(productDescription),
+                    const SizedBox(height: 100), // Add some space at the bottom
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 380,
-                        height: 300,
-                        child: Center(
-                            child: ImageProduct(imageUrl: imageUrl)),
+                      MyButton(
+                        msg: 'Edit Product',
+                        color: Colors.black,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProductPage(
+                                productID: widget.productID,
+                                storeID: widget.storeID,
+                              ),
+                            ),
+                          );
+                          _fetchData();
+                        },
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        productPrice,
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        productName,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        'Product Details',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text('Category: ${productCategory.displayName}'),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text('Condition: ${productCondition.displayName}'),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text('Stock: $productStock'),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Divider(
-                        thickness: 1.0,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Text(
-                        'Product Description',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(productDescription),
-                      const SizedBox(
-                        height: 35,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          MyButton(
-                            msg: 'Edit Product',
-                            color: Colors.black,
-                            onTap: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditProductPage(
-                                    productID: widget.productID,
-                                    storeID: widget.storeID,
+                      const SizedBox(width: 10),
+                      MyButton(
+                        msg: 'Delete Product',
+                        color: Colors.red,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Confirmation'),
+                                content: const Text(
+                                    'Are you sure you want to proceed?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Cancel'),
                                   ),
-                                ),
-                              );
-                              _fetchData();
-                            },
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          MyButton(
-                            msg: 'Delete Product',
-                            color: Colors.red,
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmation'),
-                                    content: const Text(
-                                        'Are you sure you want to proceed?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Cancel'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          deleteProduct();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Succeeded delete product!')),
-                                          );
-                                        },
-                                        child: const Text('Confirm'),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      deleteProduct();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                'Succeeded delete product!')),
+                                      );
+                                    },
+                                    child: const Text('Confirm'),
+                                  ),
+                                ],
                               );
                             },
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            ],
           );
         },
       ),
