@@ -40,4 +40,22 @@ class StoreService {
       return 'Unknown Store';
     }
   }
+
+  Future<void> updateProfile(
+      String storeID,
+      String storeName,
+      String address,
+      String city,
+      String? imageUrl,
+      ) {
+    final Timestamp timestamp = Timestamp.now();
+
+    return stores.doc(storeID).update({
+      'storeName': storeName,
+      'address': address,
+      'city': city,
+      'imageUrl': imageUrl,
+      'updatedAt': timestamp
+    });
+  }
 }

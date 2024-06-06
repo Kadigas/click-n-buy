@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/transparent_button.dart';
+import 'package:fp_ppb/pages/seller/store_edit_profile_page.dart';
 import 'package:fp_ppb/pages/seller/store_product_page.dart';
 import 'package:fp_ppb/pages/seller/store_transaction_page.dart';
 
@@ -14,11 +16,16 @@ class StoreProfilePage extends StatefulWidget {
 
 class _StoreProfilePageState extends State<StoreProfilePage> {
   late Future<QuerySnapshot> _document;
+  late String uid;
 
   @override
   void initState() {
     super.initState();
-    String uid = FirebaseAuth.instance.currentUser!.uid;
+    _fetchData();
+  }
+
+  _fetchData() {
+    uid = FirebaseAuth.instance.currentUser!.uid;
     _document = FirebaseFirestore.instance
         .collection('stores')
         .where('sellerUid', isEqualTo: uid)
@@ -47,6 +54,8 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
 
           var data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
           String storeName = data['storeName'];
+          String storeCity = data['city'];
+          String? imageUrl = data['imageUrl'];
           String storeID = snapshot.data!.docs.first.id;
 
           return SafeArea(
@@ -55,44 +64,75 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                 children: [
                   Container(
                     decoration: const BoxDecoration(color: Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.account_circle,
-                                size: 125,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GridView.count(
+                          shrinkWrap: true,
+                          crossAxisCount: 3,
+                          childAspectRatio: 1,
+                          children: [
+                            Center(
+                              child: SizedBox(
+                                width: 80,
+                                height: 80,
+                                child: imageUrl != null
+                                    ? ClipOval(
+                                        child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child:
+                                              ImageProduct(imageUrl: imageUrl),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.account_circle,
+                                        size: 80,
+                                      ),
                               ),
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    storeName,
-                                    style: const TextStyle(fontSize: 18),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  storeName,
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.location_on_sharp,
+                                      size: 16,
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    Text(storeCity),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        StoreEditProfilePage(storeID: storeID),
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.settings),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                                );
+                                setState(() {
+                                  _fetchData();
+                                });
+                              },
+                              icon: const Icon(Icons.settings),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(
