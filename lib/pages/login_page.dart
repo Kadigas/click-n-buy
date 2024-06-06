@@ -18,41 +18,57 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  void _loadingState() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
   void signUserIn() async {
     final authService = AuthService();
-
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+    _loadingState();
 
     try {
       await authService.signInWithEmailPassword(
           emailController.text, passwordController.text);
+      Navigator.of(context, rootNavigator: true).pop();
+    } catch (e) {
       Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showErrorMessage(e.code);
+      showErrorMessage(e.toString().replaceFirst('Exception: ', 'Error: '));
     }
   }
 
   void showErrorMessage(String message) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: Colors.red,
-            title: Center(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white),
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          title: Center(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Colors.white),
               ),
             ),
-          );
-        });
+          ],
+        );
+      },
+    );
   }
 
   @override
