@@ -128,7 +128,12 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Center(child: ImageProduct(imageUrl: imageUrl)),
+                      SizedBox(
+                        width: 380,
+                        height: 300,
+                        child: Center(
+                            child: ImageProduct(imageUrl: imageUrl)),
+                      ),
                       const SizedBox(
                         height: 10,
                       ),

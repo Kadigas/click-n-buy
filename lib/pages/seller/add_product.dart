@@ -26,8 +26,8 @@ class _AddProductPageState extends State<AddProductPage> {
   final productStockController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
-  final ImageCloudService imageUploadService = ImageCloudService();
   String? imageUrl;
+  final ImageCloudService imageUploadService = ImageCloudService();
 
   void _loadingState() {
     showDialog(
@@ -94,7 +94,6 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    String? imageUrl;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -123,68 +122,70 @@ class _AddProductPageState extends State<AddProductPage> {
                 children: [
                   imageUrl != null
                       ? Column(
-                          children: [
-                            Stack(
-                              children: [
-                                Center(
-                                  child: SizedBox(
-                                    width: 200,
-                                    child: ImageProduct(imageUrl: imageUrl),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: -12,
-                                  right: 68,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close_rounded),
-                                    onPressed: () {
-                                      setState(
-                                        () {
-                                          imageUrl = null;
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
+                    children: [
+                      Stack(
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              color: Colors.white,
+                              child: ImageProduct(imageUrl: imageUrl),
                             ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.add_photo_alternate,
-                                size: 180,
-                              ),
-                              onPressed: () async {
-                                XFile? image = await pickImage();
-                                if (image != null) {
-                                  _loadingState();
-                                  String? filename = await imageUploadService
-                                      .uploadImage(image!);
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop();
-                                  setState(
-                                    () {
-                                      imageUrl = imageUploadService.getEndpoint(
-                                          ImageUploadEndpoint
-                                              .getImageByFilename,
-                                          arg: filename);
-                                    },
-                                  );
-                                }
+                          ),
+                          Positioned(
+                            top: -12,
+                            right: 68,
+                            child: IconButton(
+                              icon: const Icon(Icons.close_rounded),
+                              onPressed: () {
+                                setState(
+                                      () {
+                                    imageUrl = null;
+                                  },
+                                );
                               },
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                    ],
+                  )
+                      : Column(
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.add_photo_alternate,
+                          size: 180,
                         ),
+                        onPressed: () async {
+                          XFile? image = await pickImage();
+                          if (image != null) {
+                            _loadingState();
+                            String? filename = await imageUploadService
+                                .uploadImage(image!);
+                            Navigator.of(context, rootNavigator: true)
+                                .pop();
+                            setState(
+                                  () {
+                                imageUrl = imageUploadService.getEndpoint(
+                                    ImageUploadEndpoint
+                                        .getImageByFilename,
+                                    arg: filename);
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                   TextFormField(
                     controller: productNameController,
                     decoration:
-                        const InputDecoration(labelText: 'Product Name'),
+                    const InputDecoration(labelText: 'Product Name'),
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<ProductCategory>(
@@ -196,7 +197,7 @@ class _AddProductPageState extends State<AddProductPage> {
                       });
                     },
                     items:
-                        ProductCategory.values.map((ProductCategory category) {
+                    ProductCategory.values.map((ProductCategory category) {
                       return DropdownMenuItem<ProductCategory>(
                         value: category,
                         child: Text(category.displayName),

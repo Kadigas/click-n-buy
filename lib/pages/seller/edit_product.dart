@@ -158,7 +158,7 @@ class _EditProductPageState extends State<EditProductPage> {
     return Scaffold(
       appBar: AppBar(
         title:
-            const Text("Edit Product", style: TextStyle(color: Colors.white)),
+        const Text("Edit Product", style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.black,
         leading: IconButton(
@@ -185,8 +185,6 @@ class _EditProductPageState extends State<EditProductPage> {
             return const Center(child: Text('Document not found'));
           }
 
-          String? imageUrl;
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -195,69 +193,71 @@ class _EditProductPageState extends State<EditProductPage> {
                   children: [
                     imageUrl != null
                         ? Column(
-                            children: [
-                              Stack(
-                                children: [
-                                  Center(
-                                    child: SizedBox(
-                                      width: 200,
-                                      child: ImageProduct(imageUrl: imageUrl),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: -12,
-                                    right: 68,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.close_rounded),
-                                      onPressed: () {
-                                        setState(
-                                          () {
-                                            imageUrl = null;
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
+                      children: [
+                        Stack(
+                          children: [
+                            Center(
+                              child: Container(
+                                width: 220,
+                                height: 220,
+                                color: Colors.white,
+                                child: ImageProduct(imageUrl: imageUrl),
                               ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.add_photo_alternate,
-                                  size: 180,
-                                ),
-                                onPressed: () async {
-                                  XFile? image = await pickImage();
-                                  if (image != null) {
-                                    _loadingState();
-                                    String? filename = await imageUploadService
-                                        .uploadImage(image!);
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
-                                    setState(
-                                      () {
-                                        imageUrl =
-                                            imageUploadService.getEndpoint(
-                                                ImageUploadEndpoint
-                                                    .getImageByFilename,
-                                                arg: filename);
-                                      },
-                                    );
-                                  }
+                            ),
+                            Positioned(
+                              top: -10,
+                              right: 55,
+                              child: IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () {
+                                  setState(
+                                        () {
+                                      imageUrl = null;
+                                    },
+                                  );
                                 },
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                    )
+                        : Column(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.add_photo_alternate,
+                            size: 180,
                           ),
+                          onPressed: () async {
+                            XFile? image = await pickImage();
+                            if (image != null) {
+                              _loadingState();
+                              String? filename = await imageUploadService
+                                  .uploadImage(image!);
+                              Navigator.of(context, rootNavigator: true)
+                                  .pop();
+                              setState(
+                                    () {
+                                  imageUrl =
+                                      imageUploadService.getEndpoint(
+                                          ImageUploadEndpoint
+                                              .getImageByFilename,
+                                          arg: filename);
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                     TextFormField(
                       controller: productNameController,
                       decoration:
-                          const InputDecoration(labelText: 'Product Name'),
+                      const InputDecoration(labelText: 'Product Name'),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<ProductCategory>(
@@ -292,7 +292,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     TextFormField(
                       controller: productDescriptionController,
                       decoration:
-                          const InputDecoration(labelText: 'Description'),
+                      const InputDecoration(labelText: 'Description'),
                     ),
                     const SizedBox(height: 10),
                     DropdownButtonFormField<ProductCondition>(
