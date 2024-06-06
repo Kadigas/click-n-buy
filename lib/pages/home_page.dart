@@ -230,13 +230,16 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: [
                                     Expanded(
                                       child: Container(
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12)
+                                          ),
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Center(
                                           child: ImageProduct(imageUrl: imageUrl),
