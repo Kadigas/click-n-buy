@@ -7,7 +7,9 @@ class Users {
   final String firstName;
   final String lastName;
   final bool hasStore;
-  final String address;
+  String? address;
+  String? city;
+  String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -18,7 +20,9 @@ class Users {
     required this.firstName,
     required this.lastName,
     required this.hasStore,
-    required this.address,
+    this.address,
+    this.city,
+    this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -31,7 +35,9 @@ class Users {
       'firstName': firstName,
       'lastName': lastName,
       'hasStore': hasStore,
-      'address': address,
+      'address': address ?? "",
+      'city': city ?? "",
+      'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

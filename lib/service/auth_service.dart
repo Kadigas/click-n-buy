@@ -56,7 +56,6 @@ class AuthService {
           firstName: firstName,
           lastName: lastName,
           hasStore: false,
-          address: '',
           createdAt: timestamp,
           updatedAt: timestamp,
       );

@@ -14,9 +14,10 @@ class RegisterStorePage extends StatefulWidget {
 }
 
 class _RegisterStorePageState extends State<RegisterStorePage> {
-  final emailController = TextEditingController();
+  late String email;
   final storeNameController = TextEditingController();
   final addressController = TextEditingController();
+  final cityController = TextEditingController();
 
   late Future<DocumentSnapshot> _userDocument;
 
@@ -29,8 +30,9 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
     _userDocument.then((snapshot) {
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        emailController.text = data['email'];
+        email = data['email'];
         addressController.text = data['address'];
+        cityController.text = data['city'];
       }
     });
   }
@@ -51,12 +53,14 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
 
     try {
       await storeService.registerStore(
-        emailController.text,
+        email,
         storeNameController.text,
         addressController.text,
+        cityController.text,
       );
       await userService.updateHasStore(uid);
       Navigator.of(context, rootNavigator: true).pop();
+      Navigator.of(context).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -131,12 +135,11 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
                         controller: addressController,
                         decoration: InputDecoration(labelText: 'Address'),
                       ),
-                      const SizedBox(height: 10),
                       TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
-                        keyboardType: TextInputType.number,
+                        controller: cityController,
+                        decoration: InputDecoration(labelText: 'City'),
                       ),
+                      const SizedBox(height: 10),
                       SizedBox(height: 20),
                       BigButton(
                         onTap: () {

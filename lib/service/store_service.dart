@@ -13,7 +13,7 @@ class StoreService {
     return _auth.currentUser;
   }
 
-  Future<void> registerStore(String email, storeName, address) {
+  Future<void> registerStore(String email, storeName, address, city) {
     final Timestamp timestamp = Timestamp.now();
 
     final User user = getCurrentUser()!;
@@ -23,6 +23,7 @@ class StoreService {
         email: email,
         storeName: storeName,
         address: address,
+        city: city,
         createdAt: timestamp,
         updatedAt: timestamp);
 
