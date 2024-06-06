@@ -6,17 +6,36 @@ class UserService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final CollectionReference users =
-  FirebaseFirestore.instance.collection('users');
+      FirebaseFirestore.instance.collection('users');
 
   User? getCurrentUser() {
     return _auth.currentUser;
   }
 
-  Future<void> updateHasStore(String docID){
+  Future<void> updateProfile(
+    String uid,
+    String username,
+    String firstName,
+    String lastName,
+    String address,
+    String city,
+    String? imageUrl,
+  ) {
     final Timestamp timestamp = Timestamp.now();
-    return users.doc(docID).update({
-      'hasStore': true,
+
+    return users.doc(uid).update({
+      'username': username,
+      'firstName': firstName,
+      'lastName': lastName,
+      'address': address,
+      'city': city,
+      'imageUrl': imageUrl,
       'updatedAt': timestamp
     });
+  }
+
+  Future<void> updateHasStore(String docID) {
+    final Timestamp timestamp = Timestamp.now();
+    return users.doc(docID).update({'hasStore': true, 'updatedAt': timestamp});
   }
 }
