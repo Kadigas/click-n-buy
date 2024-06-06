@@ -10,22 +10,26 @@ class AuthService {
     return _auth.currentUser;
   }
 
-  Future<UserCredential> signInWithEmailPassword(String email, password) async {
+  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-
-      // save user info if it doesn't exist
-      // _firestore.collection("users").doc(userCredential.user!.uid).set(
-      //   {
-      //     "uid": userCredential.user!.uid,
-      //     'email': email
-      //   }
-      // );
-
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      switch (e.code) {
+        case 'invalid-credential':
+          throw Exception('Incorrect email or password!');
+        case 'invalid-email':
+          throw Exception('Invalid email address.');
+        case 'user-disabled':
+          throw Exception('This user has been disabled.');
+        case 'user-not-found':
+          throw Exception('No user found with this email.');
+        case 'wrong-password':
+          throw Exception('Incorrect password.');
+        default:
+          throw Exception('An unknown error occurred.');
+      }
     }
   }
 

@@ -36,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if(passwordController.text != confirmPasswordController.text) {
       Navigator.pop(context);
-      showErrorMessage("Passwords don't match!");
+      showErrorMessage("Error: Passwords don't match!");
       return;
     }
 
@@ -56,17 +56,31 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void showErrorMessage(String message) {
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        backgroundColor: Colors.red,
-        title: Center(
-          child: Text(
-            message,
-            style: const TextStyle(color: Colors.white),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          title: Center(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
-        ),
-      );
-    });
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Close',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
