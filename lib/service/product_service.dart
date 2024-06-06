@@ -104,6 +104,16 @@ class ProductService {
     return productStream;
   }
 
+  Future<Map<String, dynamic>> getStoreProduct(String storeID, String productID) async {
+    DocumentSnapshot productDoc = await _firestore
+        .collection('stores')
+        .doc(storeID)
+        .collection('products')
+        .doc(productID)
+        .get();
+    return productDoc.data() as Map<String, dynamic>? ?? {};
+  }
+
   Future<void> addStoreProduct(String storeID, productId, productName,
       productPrice, productStock, String? imageUrl) {
     final Timestamp timestamp = Timestamp.now();

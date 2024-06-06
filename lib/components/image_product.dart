@@ -27,8 +27,8 @@ class ImageProduct extends StatelessWidget {
           )
         : const Center(
             child: Icon(
-              Icons.keyboard,
-              size: 150,
+              Icons.photo,
+              size: 60,
             ),
           );
   }
