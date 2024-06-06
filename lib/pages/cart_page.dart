@@ -76,25 +76,25 @@ class _CartPageState extends State<CartPage> {
                             String productID = data['productID'];
                             int quantity = data['quantity'];
 
-                            return FutureBuilder<Map<String, dynamic>>(
-                              future: productService.getStoreProduct(
-                                  storeID, productID),
-                              builder: (context, productSnapshot) {
-                                if (productSnapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                                if (productSnapshot.hasError) {
-                                  return Center(
-                                      child: Text(
-                                          'Error: ${productSnapshot.error}'));
-                                }
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16.0, vertical: 8.0),
+                              child: FutureBuilder<Map<String, dynamic>>(
+                                future: productService.getStoreProduct(
+                                    storeID, productID),
+                                builder: (context, productSnapshot) {
+                                  if (productSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  }
+                                  if (productSnapshot.hasError) {
+                                    return Center(
+                                        child: Text(
+                                            'Error: ${productSnapshot.error}'));
+                                  }
 
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0, vertical: 8.0),
-                                  child: ListTile(
+                                  return ListTile(
                                     leading: Container(
                                       width: 80,
                                       height: 80,
@@ -113,9 +113,9 @@ class _CartPageState extends State<CartPage> {
                                       value: true,
                                       onChanged: (value) {},
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             );
                           }).toList(),
                         ),
