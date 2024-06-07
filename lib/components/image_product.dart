@@ -24,6 +24,13 @@ class ImageProduct extends StatelessWidget {
                 ),
               );
             },
+            errorBuilder: (BuildContext context, Object exception,
+                StackTrace? stackTrace) {
+              return const Icon(
+                Icons.broken_image,
+                size: 100.0,
+              );
+            },
           )
         : const Center(
             child: Icon(
