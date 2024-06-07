@@ -55,6 +55,7 @@ class CartService {
         storeID: storeID,
         productID: productID,
         quantity: qty,
+        isChecked: true,
         createdAt: createdAt,
         updatedAt: timestamp,
       );
@@ -98,7 +99,35 @@ class CartService {
 
   Future<String> getStoreName(String storeID) async {
     DocumentSnapshot storeDoc =
-    await _firestore.collection('stores').doc(storeID).get();
-    return (storeDoc.data() as Map<String, dynamic>?)?['storeName'] ?? 'Unknown Store';
+        await _firestore.collection('stores').doc(storeID).get();
+    return (storeDoc.data() as Map<String, dynamic>?)?['storeName'] ??
+        'Unknown Store';
+  }
+
+  Future<double> getPriceForProduct(String productID) async {
+    DocumentSnapshot document =
+    await _firestore.collection('products').doc(productID).get();
+    return (document.data() as Map<String, dynamic>?)?['productPrice'] ??
+        0.0;
+  }
+
+  Future<void> updateCartCheckedState(String documentId, bool isChecked) async {
+    final currentUser = _auth.getCurrentUser();
+    await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('cart')
+        .doc(documentId)
+        .update({'isChecked': isChecked});
+  }
+
+  Future<void> updateCartQuantity(String documentId, int newQuantity) async {
+    final currentUser = _auth.getCurrentUser();
+    await _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('cart')
+        .doc(documentId)
+        .update({'quantity': newQuantity});
   }
 }

@@ -4,6 +4,7 @@ class Cart {
   final String storeID;
   final String productID;
   final int quantity;
+  final bool isChecked;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -11,6 +12,7 @@ class Cart {
     required this.storeID,
     required this.productID,
     required this.quantity,
+    required this.isChecked,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -20,6 +22,7 @@ class Cart {
       'storeID': storeID,
       'productID': productID,
       'quantity': quantity,
+      'isChecked': isChecked,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
