@@ -156,12 +156,25 @@ class _CartPageState extends State<CartPage> {
                                                   formatCurrency.format(productPrice),
                                                   style: const TextStyle(fontWeight: FontWeight.bold),
                                                 ),
-                                                QuantityEditor(
-                                                  initialQuantity: quantities[documentId]!,
-                                                  onQuantityChanged: (newQuantity) async {
-                                                    quantities[documentId] = newQuantity;
-                                                    await updateTotalPrice();
-                                                  },
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    IconButton(
+                                                        onPressed: () {},
+                                                        icon: const Icon(Icons.delete),
+                                                        iconSize: 16,
+                                                      ),
+                                                    Expanded(
+                                                      child: QuantityEditor(
+                                                        initialQuantity: quantities[documentId]!,
+                                                        onQuantityChanged: (newQuantity) async {
+                                                          quantities[documentId] = newQuantity;
+                                                          await updateTotalPrice();
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
@@ -217,6 +230,7 @@ class _CartPageState extends State<CartPage> {
                     if (value > 0) {
                       return MyButton(
                         onTap: () {
+                          // Handle checkout action
                         },
                         msg: 'Checkout',
                         color: Colors.black,
