@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fp_ppb/models/users.dart';
-
 class UserService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -19,6 +17,8 @@ class UserService {
     String lastName,
     String address,
     String city,
+    String province,
+    String district,
     String? imageUrl,
   ) {
     final Timestamp timestamp = Timestamp.now();
@@ -29,6 +29,8 @@ class UserService {
       'lastName': lastName,
       'address': address,
       'city': city,
+      'province': province,
+      'district': district,
       'imageUrl': imageUrl,
       'updatedAt': timestamp
     });

@@ -8,7 +8,9 @@ class Users {
   final String lastName;
   final bool hasStore;
   String? address;
+  String? province;
   String? city;
+  String? district;
   String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
@@ -21,7 +23,9 @@ class Users {
     required this.lastName,
     required this.hasStore,
     this.address,
+    this.province,
     this.city,
+    this.district,
     this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -36,7 +40,9 @@ class Users {
       'lastName': lastName,
       'hasStore': hasStore,
       'address': address ?? "",
+      'province': province ?? "",
       'city': city ?? "",
+      'district': district ?? "",
       'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,

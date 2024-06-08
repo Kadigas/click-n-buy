@@ -5,6 +5,7 @@ class Store {
   final String email;
   final String storeName;
   String? address;
+  final String province;
   final String city;
   final Timestamp createdAt;
   final Timestamp updatedAt;
@@ -14,6 +15,7 @@ class Store {
     required this.email,
     required this.storeName,
     this.address,
+    required this.province,
     required this.city,
     required this.createdAt,
     required this.updatedAt,
@@ -25,6 +27,7 @@ class Store {
       'email': email,
       'storeName': storeName,
       'address': address ?? "",
+      'province': province,
       'city': city,
       'createdAt': createdAt,
       'updatedAt': updatedAt,

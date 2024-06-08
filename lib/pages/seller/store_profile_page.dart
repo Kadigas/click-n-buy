@@ -6,6 +6,7 @@ import 'package:fp_ppb/components/transparent_button.dart';
 import 'package:fp_ppb/pages/seller/store_edit_profile_page.dart';
 import 'package:fp_ppb/pages/seller/store_product_page.dart';
 import 'package:fp_ppb/pages/seller/store_transaction_page.dart';
+import 'package:fp_ppb/service/location_cloud_service.dart';
 
 class StoreProfilePage extends StatefulWidget {
   const StoreProfilePage({super.key});
@@ -17,6 +18,7 @@ class StoreProfilePage extends StatefulWidget {
 class _StoreProfilePageState extends State<StoreProfilePage> {
   late Future<QuerySnapshot> _document;
   late String uid;
+  final locationCloudService = LocationCloudService();
 
   @override
   void initState() {
@@ -24,12 +26,20 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
     _fetchData();
   }
 
-  _fetchData() {
+  void _fetchData() {
     uid = FirebaseAuth.instance.currentUser!.uid;
     _document = FirebaseFirestore.instance
         .collection('stores')
         .where('sellerUid', isEqualTo: uid)
         .get();
+  }
+
+  Future<String?> _getCityName(String provinceId, String cityId) async {
+    try {
+      return await locationCloudService.getCityName(provinceId, cityId);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -54,129 +64,142 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
 
           var data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
           String storeName = data['storeName'];
-          String storeCity = data['city'];
+          String provinceId = data['province'];
+          String cityId = data['city'];
           String? imageUrl = data['imageUrl'];
           String storeID = snapshot.data!.docs.first.id;
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GridView.count(
-                          shrinkWrap: true,
-                          crossAxisCount: 3,
-                          childAspectRatio: 1,
+          return FutureBuilder<String?>(
+            future: _getCityName(provinceId, cityId),
+            builder: (context, citySnapshot) {
+              if (citySnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (citySnapshot.hasError) {
+                return Center(child: Text('Error: ${citySnapshot.error}'));
+              }
+              String storeCity = citySnapshot.data ?? 'Unknown City';
+
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Center(
-                              child: SizedBox(
-                                width: 80,
-                                height: 80,
-                                child: imageUrl != null
-                                    ? ClipOval(
-                                        child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child:
-                                              ImageProduct(imageUrl: imageUrl),
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.account_circle,
-                                        size: 80,
-                                      ),
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            GridView.count(
+                              shrinkWrap: true,
+                              crossAxisCount: 3,
+                              childAspectRatio: 1,
                               children: [
-                                Text(
-                                  storeName,
-                                  style: const TextStyle(fontSize: 18),
+                                Center(
+                                  child: SizedBox(
+                                    width: 80,
+                                    height: 80,
+                                    child: imageUrl != null
+                                        ? ClipOval(
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: ImageProduct(imageUrl: imageUrl),
+                                      ),
+                                    )
+                                        : const Icon(
+                                      Icons.account_circle,
+                                      size: 80,
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(
-                                      Icons.location_on_sharp,
-                                      size: 16,
+                                    Text(
+                                      storeName,
+                                      style: const TextStyle(fontSize: 18),
                                     ),
                                     const SizedBox(
-                                      width: 2,
+                                      height: 5,
                                     ),
-                                    Text(storeCity),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on_sharp,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Text(storeCity),
+                                      ],
+                                    ),
                                   ],
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            StoreEditProfilePage(storeID: storeID),
+                                      ),
+                                    );
+                                    setState(() {
+                                      _fetchData();
+                                    });
+                                  },
+                                  icon: const Icon(Icons.settings),
                                 ),
                               ],
                             ),
-                            IconButton(
-                              onPressed: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        StoreEditProfilePage(storeID: storeID),
-                                  ),
-                                );
-                                setState(() {
-                                  _fetchData();
-                                });
-                              },
-                              icon: const Icon(Icons.settings),
-                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TransparentButton(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      StoreProductPage(storeID: storeID),
-                                ),
-                              );
-                            },
-                            msg: 'My Products',
-                          ),
-                          TransparentButton(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const StoreTransactionPage(),
-                                ),
-                              );
-                            },
-                            msg: 'Transactions',
-                          ),
-                        ],
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              TransparentButton(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          StoreProductPage(storeID: storeID),
+                                    ),
+                                  );
+                                },
+                                msg: 'My Products',
+                              ),
+                              TransparentButton(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                      const StoreTransactionPage(),
+                                    ),
+                                  );
+                                },
+                                msg: 'Transactions',
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
