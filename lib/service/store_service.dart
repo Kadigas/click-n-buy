@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fp_ppb/models/product.dart';
 import 'package:fp_ppb/models/store.dart';
-import 'package:fp_ppb/models/storeProduct.dart';
 
 class StoreService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -13,7 +11,7 @@ class StoreService {
     return _auth.currentUser;
   }
 
-  Future<void> registerStore(String email, storeName, address, city) {
+  Future<void> registerStore(String email, storeName, address, city, province) {
     final Timestamp timestamp = Timestamp.now();
 
     final User user = getCurrentUser()!;
@@ -23,6 +21,7 @@ class StoreService {
         email: email,
         storeName: storeName,
         address: address,
+        province: province,
         city: city,
         createdAt: timestamp,
         updatedAt: timestamp);
@@ -46,6 +45,7 @@ class StoreService {
       String storeName,
       String address,
       String city,
+      String province,
       String? imageUrl,
       ) {
     final Timestamp timestamp = Timestamp.now();
@@ -53,6 +53,7 @@ class StoreService {
     return stores.doc(storeID).update({
       'storeName': storeName,
       'address': address,
+      'province': province,
       'city': city,
       'imageUrl': imageUrl,
       'updatedAt': timestamp
