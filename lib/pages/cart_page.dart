@@ -6,6 +6,7 @@ import 'package:fp_ppb/components/quantity_editor.dart';
 import 'package:fp_ppb/service/cart_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/scheduler.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -32,7 +33,6 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<void> initializeStates() async {
-    // Retrieve all cart items to initialize the checkedStates and quantities maps
     final cartItems = await cartService.getGroupedCartStream().first;
     for (var entry in cartItems.entries) {
       for (var document in entry.value) {
@@ -46,6 +46,59 @@ class _CartPageState extends State<CartPage> {
         }
       }
     }
+  }
+
+  Future<void> dropProduct(String documentId) async {
+    try {
+      await cartService.deleteCartProduct(documentId);
+      setState(() {
+        checkedStates.remove(documentId);
+        quantities.remove(documentId);
+      });
+      await updateTotalPrice();
+
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successfully dropped the product!'),
+          ),
+        );
+      });
+    } catch (e) {
+      showErrorMessage(e.toString().replaceFirst('Exception: ', 'Error: '));
+    }
+  }
+
+  Future<void> updateTotalPrice() async {
+    double newTotal = 0.0;
+
+    for (var entry in checkedStates.entries) {
+      if (entry.value) {
+        String documentId = entry.key;
+        double price = await cartService.getPriceForProduct(documentId);
+        int quantity = quantities[documentId]!;
+        newTotal += price * quantity;
+      }
+    }
+
+    totalPrice.value = newTotal;
+  }
+
+  void showErrorMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          title: Center(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -110,7 +163,6 @@ class _CartPageState extends State<CartPage> {
                                   bool isChecked = data['isChecked'];
                                   String documentId = document.id;
 
-                                  // Initialize the local state if not already done
                                   if (!checkedStates.containsKey(documentId)) {
                                     checkedStates[documentId] = isChecked;
                                   }
@@ -161,10 +213,15 @@ class _CartPageState extends State<CartPage> {
                                                   mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     IconButton(
-                                                        onPressed: () {},
-                                                        icon: const Icon(Icons.delete),
-                                                        iconSize: 16,
-                                                      ),
+                                                      onPressed: () async {
+                                                        await dropProduct(documentId);
+                                                        setState(() {
+                                                          storeCartItems.remove(document);
+                                                        });
+                                                      },
+                                                      icon: const Icon(Icons.delete),
+                                                      iconSize: 16,
+                                                    ),
                                                     Expanded(
                                                       child: QuantityEditor(
                                                         initialQuantity: quantities[documentId]!,
@@ -246,20 +303,5 @@ class _CartPageState extends State<CartPage> {
         ],
       ),
     );
-  }
-
-  Future<void> updateTotalPrice() async {
-    double newTotal = 0.0;
-
-    for (var entry in checkedStates.entries) {
-      if (entry.value) {
-        String documentId = entry.key;
-        double price = await cartService.getPriceForProduct(documentId);
-        int quantity = quantities[documentId]!;
-        newTotal += price * quantity;
-      }
-    }
-
-    totalPrice.value = newTotal;
   }
 }

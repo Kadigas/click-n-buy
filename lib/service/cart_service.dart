@@ -111,23 +111,33 @@ class CartService {
         0.0;
   }
 
-  Future<void> updateCartCheckedState(String documentId, bool isChecked) async {
+  Future<void> updateCartCheckedState(String productID, bool isChecked) async {
     final currentUser = _auth.getCurrentUser();
     await _firestore
         .collection('users')
         .doc(currentUser!.uid)
         .collection('cart')
-        .doc(documentId)
+        .doc(productID)
         .update({'isChecked': isChecked});
   }
 
-  Future<void> updateCartQuantity(String documentId, int newQuantity) async {
+  Future<void> updateCartQuantity(String productID, int newQuantity) async {
     final currentUser = _auth.getCurrentUser();
     await _firestore
         .collection('users')
         .doc(currentUser!.uid)
         .collection('cart')
-        .doc(documentId)
+        .doc(productID)
         .update({'quantity': newQuantity});
+  }
+
+  Future<void> deleteCartProduct(String productID) {
+    final currentUser = _auth.getCurrentUser();
+    return _firestore
+        .collection('users')
+        .doc(currentUser!.uid)
+        .collection('cart')
+        .doc(productID)
+        .delete();
   }
 }
