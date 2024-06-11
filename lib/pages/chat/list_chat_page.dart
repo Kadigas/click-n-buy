@@ -7,12 +7,13 @@ import '../../service/auth_service.dart';
 import '../../service/chat_service.dart';
 
 class ListUserPage extends StatelessWidget {
-  ListUserPage({super.key});
+  final bool isSeller;
+
+  ListUserPage({super.key, required this.isSeller});
 
   final ChatService chatService = ChatService();
   final AuthService authService = AuthService();
   final StoreService storeService = StoreService();
-  bool isSeller = false;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +48,10 @@ class ListUserPage extends StatelessWidget {
                   String message = users[index]['message'];
                   String userId = authService.getCurrentUser()!.uid;
                   String otherUserId = users[index]['senderId'] != userId? users[index]['senderId']: users[index]['receiverId'];
+                  String clientName = users[index]['userName'];
+                  String clientId = users[index]['userId'];
+                  bool isSeller = users[index]['isSeller'];
+
 
                   return FutureBuilder<String>(
                     future: storeService.getStoreName(storeId),
@@ -72,7 +77,7 @@ class ListUserPage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ChatPage(
-                                  showName: storeName,
+                                  showName:  isSeller? storeName: clientName,
                                   userId: userId,
                                   otherUserId: otherUserId,
                                   storeId: storeId,
@@ -83,7 +88,7 @@ class ListUserPage extends StatelessWidget {
                           child: Card(
                             child: ListTile(
                               title: Text(
-                                storeName,
+                                isSeller? storeName: clientName,
                                 style: const TextStyle(fontWeight: FontWeight.w700),
                               ),
                               subtitle: Text(message),

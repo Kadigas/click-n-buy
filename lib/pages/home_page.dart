@@ -106,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ListUserPage()),
+                                    builder: (context) => ListUserPage(isSeller: false,)),
                               );
                             },
                             icon: const Icon(Icons.chat),
@@ -164,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ListUserPage()),
+                                  builder: (context) => ListUserPage(isSeller: false)),
                             );
                           },
                           icon: const Icon(Icons.chat),

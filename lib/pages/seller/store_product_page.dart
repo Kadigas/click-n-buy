@@ -105,7 +105,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ListUserPage(),
+                                      builder: (context) => ListUserPage(isSeller: false),
                                     ),
                                   );
                                 },
@@ -169,7 +169,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ListUserPage(),
+                                    builder: (context) => ListUserPage(isSeller: true,),
                                   ),
                                 );
                               },
