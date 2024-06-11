@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
 import 'package:fp_ppb/pages/cart_page.dart';
-import 'package:fp_ppb/pages/list_user_page.dart';
+import 'package:fp_ppb/pages/chat/list_chat_page.dart';
 import 'package:fp_ppb/pages/show_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ListUserPage()),
+                                    builder: (context) => ListUserPage(isSeller: false,)),
                               );
                             },
                             icon: const Icon(Icons.chat),
@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => ListUserPage()),
+                                  builder: (context) => ListUserPage(isSeller: false)),
                             );
                           },
                           icon: const Icon(Icons.chat),

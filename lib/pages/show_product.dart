@@ -7,10 +7,11 @@ import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
 import 'package:fp_ppb/service/cart_service.dart';
+import 'package:fp_ppb/pages/chat/chat_page.dart';
+import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/enum_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
-
 import '../components/image_product.dart';
 
 class ShowProductPage extends StatefulWidget {
@@ -30,6 +31,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
   final ProductService productService = ProductService();
   final EnumService enumService = EnumService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -147,6 +149,8 @@ class _ShowProductPageState extends State<ShowProductPage> {
               Map<String, dynamic> data =
                   snapshot.data!.data() as Map<String, dynamic>;
               String storeName = data['storeName'];
+              String storeId = snapshot.data!.id.toString();
+              String sellerUid = data['sellerUid'];
 
               return Stack(
                 children: [
@@ -169,7 +173,8 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                     width: 380,
                                     height: 300,
                                     child: Center(
-                                        child: ImageProduct(imageUrl: imageUrl)),
+                                        child:
+                                            ImageProduct(imageUrl: imageUrl)),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -289,8 +294,21 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                 borderRadius: BorderRadius.circular(8)),
                             child: Center(
                                 child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.message))),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => ChatPage(
+                                                    showName: storeName,
+                                                    userId: _authService
+                                                        .getCurrentUser()!
+                                                        .uid,
+                                                    otherUserId: sellerUid,
+                                                    isSeller: false,
+                                                    storeId: storeId,
+                                                  )));
+                                    },
+                                    icon: const Icon(Icons.message))),
                           ),
                           const SizedBox(
                             width: 5,

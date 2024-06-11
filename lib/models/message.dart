@@ -10,11 +10,16 @@ class Message {
   final String? imageLink;
   final bool? isDelete;
   final bool? isEdit;
+  final String? storeId;
+  final bool? isSeller;
+  final String userName;
+  final String userId;
 
-  Message({required this.message, required this.senderId, required this.senderEmail, required this.receiverId, required this.timestamp, this.type, this.imageLink, this.isDelete, this.isEdit});
+  Message({required this.message, required this.senderId, required this.senderEmail, required this.receiverId, required this.timestamp, this.type, this.imageLink, this.isDelete, this.isEdit, this.storeId, this.isSeller, required this.userName, required this.userId});
 
   Map<String, dynamic> toMap() {
     return {
+      'storeId': storeId?? '',
       'senderId': senderId,
       'senderEmail': senderEmail,
       'receiverId': receiverId,
@@ -23,7 +28,10 @@ class Message {
       'type': type?? "message",
       'imageLink': imageLink?? "",
       'isDelete': isDelete?? false,
-      'isEdit': isEdit?? false
+      'isEdit': isEdit?? false,
+      'isSeller': isSeller?? false,
+      'userName': userName,
+      'userId': userId,
     };
   }
 }

@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fp_ppb/enums/chat_types.dart';
 import 'package:fp_ppb/models/message.dart';
+import 'package:fp_ppb/models/message_tile.dart';
 import 'package:fp_ppb/service/auth_service.dart';
+
+import '../models/users.dart';
 
 class ChatService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -18,10 +21,24 @@ class ChatService {
     });
   }
 
-  Future sendMessage(String receiverId, message,
+  Stream<List<Map<String, dynamic>>> getListChatStream(
+      bool isSeller, String id) {
+    String collectionPath = isSeller ? 'store_chats' : 'user_chats';
+    return _firestore
+        .collection(collectionPath)
+        .doc(id)
+        .collection('messages')
+        .snapshots()
+        .map((querySnapshot) =>
+            querySnapshot.docs.map((doc) => doc.data()).toList());
+  }
+
+  Future sendMessage(String receiverId, message, bool isSeller, String storeId,
+      userName, clientId,
       {String? type, String? imageLink}) async {
     type ??= MessageType.text.value;
     imageLink ??= "";
+    isSeller ??= false;
 
     final currentUser = _auth.getCurrentUser();
 
@@ -30,13 +47,18 @@ class ChatService {
     final Timestamp timestamp = Timestamp.now();
 
     Message newMessage = Message(
-        message: message,
-        senderId: currentUserId,
-        senderEmail: currentUserEmail!,
-        receiverId: receiverId,
-        timestamp: timestamp,
-        type: type,
-        imageLink: imageLink);
+      message: message,
+      senderId: currentUserId,
+      senderEmail: currentUserEmail!,
+      receiverId: receiverId,
+      timestamp: timestamp,
+      type: type,
+      imageLink: imageLink,
+      storeId: storeId,
+      isSeller: isSeller,
+      userName: userName,
+      userId: clientId
+    );
     List<String> ids = [currentUserId, receiverId];
     ids.sort();
     String chatRoomId = ids.join('_');
@@ -46,6 +68,25 @@ class ChatService {
         .doc(chatRoomId)
         .collection("messages")
         .add(newMessage.toMap());
+
+    // if user, send to table user then match with it, so it need to reserve
+    final String userId = !isSeller ? receiverId : currentUserId;
+    final String sellerId = isSeller ? receiverId : currentUserId;
+    // send message tile to user
+    await _firestore
+        .collection("user_chats")
+        .doc(sellerId)
+        .collection('messages')
+        .doc(userId)
+        .set(newMessage.toMap());
+
+    // send message tile to store
+    await _firestore
+        .collection("store_chats")
+        .doc(userId)
+        .collection("messages")
+        .doc(sellerId)
+        .set(newMessage.toMap());
   }
 
   Stream<QuerySnapshot> getMessages(String userId, otherUserId) {
@@ -61,7 +102,7 @@ class ChatService {
         .snapshots();
   }
 
-  String getUserRoomId(String userId, String otherUserId) {
+  String getChatRoomId(String userId, String otherUserId) {
     List<String> ids = [userId, otherUserId];
     ids.sort();
     String chatRoomId = ids.join('_');
