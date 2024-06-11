@@ -31,6 +31,25 @@ class Users {
     required this.updatedAt,
   });
 
+  factory Users.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Users(
+      uid: data['uid'],
+      email: data['email'],
+      username: data['username'],
+      firstName: data['firstName'],
+      lastName: data['lastName'],
+      hasStore: data['hasStore'],
+      address: data['address'],
+      province: data['province'],
+      city: data['city'],
+      district: data['district'],
+      imageUrl: data['imageUrl'],
+      createdAt: data['createdAt'],
+      updatedAt: data['updatedAt'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,

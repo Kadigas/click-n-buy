@@ -11,15 +11,18 @@ import '../../enums/chat_types.dart';
 
 class ChatPage extends StatefulWidget {
   final String userId;
-  final String userEmail;
+  final String showName;
   final String otherUserId;
+  final bool? isSeller;
+  final String storeId;
 
-  const ChatPage({
-    super.key,
-    required this.userId,
-    required this.userEmail,
-    required this.otherUserId,
-  });
+  const ChatPage(
+      {super.key,
+      required this.userId,
+      required this.showName,
+      required this.otherUserId,
+      this.isSeller,
+      required this.storeId});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -56,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
       }
@@ -64,10 +67,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage({String? text, MessageType? type, String? imagePath}) async {
+    bool isSeller = widget.isSeller ?? false;
+    String storeId = widget.storeId ?? "";
     if (text?.isNotEmpty == true) {
       await chatService.sendMessage(
         widget.otherUserId,
         text,
+        isSeller,
+        storeId,
         type: MessageType.text.value,
       );
     } else if (type == MessageType.image && imagePath != null) {
@@ -76,6 +83,8 @@ class _ChatPageState extends State<ChatPage> {
       await chatService.sendMessage(
         widget.otherUserId,
         "",
+        isSeller,
+        storeId,
         type: MessageType.image.value,
         imageLink: imagePath,
       );
@@ -98,7 +107,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.userEmail),
+        title: Text(widget.showName),
         centerTitle: true,
         actions: [
           const Icon(Icons.info),
