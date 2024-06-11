@@ -37,7 +37,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   List<Map<String, dynamic>> districts = [];
   String? selectedProvince;
   String? selectedCity;
-  String? selectedDistrict;
 
   void _loadingState() {
     showDialog(
@@ -68,7 +67,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         addressController.text!,
         selectedCity!,
         selectedProvince!,
-        selectedDistrict!, // Updated this line
         imageUrl,
       );
       Navigator.of(context, rootNavigator: true).pop();
@@ -94,10 +92,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
     if (selectedCity == null) {
       showErrorMessage("City cannot be empty!");
-      return false;
-    }
-    if (selectedDistrict == null) {
-      showErrorMessage("District cannot be empty!");
       return false;
     }
     return true;
@@ -145,7 +139,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         addressController.text = data['address'];
         selectedCity = data['city'];
         selectedProvince = data['province'];
-        selectedDistrict = data['district'];
         imageUrl = data['imageUrl'];
 
         if (selectedProvince != null) {
@@ -154,13 +147,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           setState(() {
             cities = fetchedCities;
           });
-          if (selectedCity != null) {
-            List<Map<String, dynamic>> fetchedDistricts =
-            await locationCloudService.getDistricts(selectedCity!);
-            setState(() {
-              districts = fetchedDistricts;
-            });
-          }
         }
       }
     });
@@ -299,10 +285,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       onChanged: (value) async {
                         setState(() {
                           selectedProvince = value;
-                          selectedCity = null; // Reset city when province changes
-                          cities = []; // Clear city list
-                          selectedDistrict = null; // Reset district when city changes
-                          districts = []; // Clear district list
+                          selectedCity = null;
+                          cities = [];
+                          districts = [];
                         });
                         if (value != null) {
                           List<Map<String, dynamic>> fetchedCities =
@@ -321,26 +306,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       onChanged: (value) async {
                         setState(() {
                           selectedCity = value;
-                          selectedDistrict = null; // Reset district when city changes
-                          districts = []; // Clear district list
-                        });
-                        if (value != null) {
-                          List<Map<String, dynamic>> fetchedDistricts =
-                          await locationCloudService.getDistricts(value);
-                          setState(() {
-                            districts = fetchedDistricts;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    buildDropdownButtonFormField(
-                      selectedValue: selectedDistrict,
-                      label: 'District',
-                      items: districts,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedDistrict = value;
                         });
                       },
                     ),
