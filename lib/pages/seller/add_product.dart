@@ -24,6 +24,7 @@ class _AddProductPageState extends State<AddProductPage> {
   final productDescriptionController = TextEditingController();
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
+  final productWeightController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
   String? imageUrl;
@@ -53,6 +54,7 @@ class _AddProductPageState extends State<AddProductPage> {
         productPriceController.text,
         productStockController.text,
         selectedCondition.toString().split('.').last,
+        productWeightController.text,
         imageUrl,
       );
       String productId = productDocRef.id;

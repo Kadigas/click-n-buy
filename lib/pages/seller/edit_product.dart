@@ -31,6 +31,7 @@ class _EditProductPageState extends State<EditProductPage> {
   final productStockController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
+  final productWeightController = TextEditingController();
   String? imageUrl;
   final ImageCloudService imageUploadService = ImageCloudService();
 
@@ -91,6 +92,7 @@ class _EditProductPageState extends State<EditProductPage> {
         productPriceController.text,
         productStockController.text,
         selectedCondition.toString().split('.').last,
+        productWeightController.text,
         imageUrl,
         createdAt,
       );
