@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fp_ppb/models/users.dart';
 
 class AuthService {
@@ -8,6 +9,27 @@ class AuthService {
 
   User? getCurrentUser() {
     return _auth.currentUser;
+  }
+
+  Future<Users?> getDetailUser(String uid) async {
+    try {
+      // Fetch user document from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      // Check if the document exists
+      if (!userDoc.exists) {
+        return null;
+      }
+
+      // Create a Users instance from the document data
+      Users user = Users.fromDocument(userDoc);
+      return user;
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching user: $e");
+      }
+      return null;
+    }
   }
 
   Future<UserCredential> signInWithEmailPassword(String email, String password) async {
