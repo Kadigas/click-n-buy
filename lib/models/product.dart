@@ -8,6 +8,7 @@ class Product {
   final double productPrice;
   final int productStock;
   final String productCondition;
+  final String productWeight;
   final String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
@@ -20,6 +21,7 @@ class Product {
     required this.productPrice,
     required this.productStock,
     required this.productCondition,
+    required this.productWeight,
     this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -34,6 +36,7 @@ class Product {
       'productPrice': productPrice,
       'productStock': productStock,
       'productCondition': productCondition,
+      'productWeight': productWeight,
       'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,

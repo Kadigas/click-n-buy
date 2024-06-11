@@ -21,6 +21,7 @@ class ProductService {
       productPrice,
       productStock,
       productCondition,
+      productWeight,
       String? imageUrl) {
     final Timestamp timestamp = Timestamp.now();
 
@@ -32,6 +33,7 @@ class ProductService {
         productPrice: double.parse(productPrice),
         productStock: int.parse(productStock),
         productCondition: productCondition,
+        productWeight: productWeight,
         imageUrl: imageUrl ?? "",
         createdAt: timestamp,
         updatedAt: timestamp);
@@ -57,6 +59,7 @@ class ProductService {
     productPrice,
     productStock,
     productCondition,
+    productWeight,
     String? imageUrl,
     Timestamp createdAt,
   ) {
@@ -70,6 +73,7 @@ class ProductService {
       productPrice: double.parse(productPrice),
       productStock: int.parse(productStock),
       productCondition: productCondition,
+      productWeight: productWeight,
       imageUrl: imageUrl ?? "",
       createdAt: createdAt,
       updatedAt: timestamp,
@@ -105,7 +109,8 @@ class ProductService {
     return productStream;
   }
 
-  Future<Map<String, dynamic>> getStoreProduct(String storeID, String productID) async {
+  Future<Map<String, dynamic>> getStoreProduct(
+      String storeID, String productID) async {
     DocumentSnapshot productDoc = await _firestore
         .collection('stores')
         .doc(storeID)
