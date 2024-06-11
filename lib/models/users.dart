@@ -10,7 +10,6 @@ class Users {
   String? address;
   String? province;
   String? city;
-  String? district;
   String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
@@ -25,7 +24,6 @@ class Users {
     this.address,
     this.province,
     this.city,
-    this.district,
     this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -43,7 +41,6 @@ class Users {
       address: data['address'],
       province: data['province'],
       city: data['city'],
-      district: data['district'],
       imageUrl: data['imageUrl'],
       createdAt: data['createdAt'],
       updatedAt: data['updatedAt'],
@@ -61,7 +58,6 @@ class Users {
       'address': address ?? "",
       'province': province ?? "",
       'city': city ?? "",
-      'district': district ?? "",
       'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,

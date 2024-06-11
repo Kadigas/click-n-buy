@@ -18,7 +18,6 @@ class UserService {
     String address,
     String city,
     String province,
-    String district,
     String? imageUrl,
   ) {
     final Timestamp timestamp = Timestamp.now();
@@ -30,7 +29,6 @@ class UserService {
       'address': address,
       'city': city,
       'province': province,
-      'district': district,
       'imageUrl': imageUrl,
       'updatedAt': timestamp
     });
