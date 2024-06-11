@@ -6,8 +6,10 @@ Widget buildDropdownButtonFormField({
   required List<Map<String, dynamic>> items,
   required ValueChanged<String?> onChanged,
 }) {
+  String? value = items.any((item) => item['id'] == selectedValue) ? selectedValue : null;
+
   return DropdownButtonFormField<String>(
-    value: selectedValue,
+    value: value,
     decoration: InputDecoration(labelText: label),
     items: items
         .map((item) => DropdownMenuItem<String>(
