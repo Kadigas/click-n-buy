@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
+import 'package:fp_ppb/pages/cart_page.dart';
 import 'package:fp_ppb/pages/chat/list_chat_page.dart';
 import 'package:fp_ppb/pages/show_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
@@ -92,7 +93,12 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const CartPage()),
+                                  );
+                                },
                                 icon: const Icon(Icons.shopping_cart),
                               ),
                               IconButton(
@@ -150,7 +156,12 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const CartPage()),
+                                );
+                              },
                               icon: const Icon(Icons.shopping_cart),
                             ),
                             IconButton(

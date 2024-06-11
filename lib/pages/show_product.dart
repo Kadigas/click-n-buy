@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -5,12 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
+import 'package:fp_ppb/service/cart_service.dart';
 import 'package:fp_ppb/pages/chat/chat_page.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/enum_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
-
 import '../components/image_product.dart';
 
 class ShowProductPage extends StatefulWidget {
@@ -47,6 +48,33 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .collection('stores')
         .doc(widget.storeID)
         .get();
+  }
+
+  void _loadingState() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
+  Future<void> addToCart(String storeID, productID) async {
+    final cartService = CartService();
+    _loadingState();
+
+    try {
+      await cartService.addToCart(
+        storeID,
+        productID,
+      );
+      Navigator.of(context, rootNavigator: true).pop();
+    } on FirebaseAuthException catch (e) {
+      Navigator.of(context, rootNavigator: true).pop();
+      showErrorMessage(e.code);
+    }
   }
 
   void showErrorMessage(String message) {
@@ -246,7 +274,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                     ),
                   ),
                   Positioned(
-                    bottom: 10,
+                    bottom: 5,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -288,7 +316,15 @@ class _ShowProductPageState extends State<ShowProductPage> {
                           MyButton(
                             msg: 'Add to Cart',
                             color: Colors.black,
-                            onTap: () {},
+                            onTap: () async {
+                              await addToCart(widget.storeID, widget.productID);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Succeeded add to cart!')),
+                              );
+                            },
                           ),
                           const SizedBox(
                             width: 5,
