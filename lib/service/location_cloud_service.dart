@@ -1,37 +1,29 @@
+import 'package:fp_ppb/service/api_key_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LocationCloudService {
+  final key = APIKeyService().getAPIKey();
+
   Future<List<Map<String, dynamic>>> getProvinces() async {
-    final response = await http.get(Uri.parse('https://alamat.thecloudalert.com/api/provinsi/get/'));
+    final response = await http.get(Uri.parse('https://api.rajaongkir.com/starter/province'), headers: {'key': key});
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['result'];
-      return data.map((province) => {'id': province['id'], 'name': province['text']}).toList();
+      List data = jsonDecode(response.body)['rajaongkir']['results'];
+      return data.map((province) => {'id': province['province_id'], 'name': province['province']}).toList();
     } else {
       throw Exception('Failed to load provinces');
     }
   }
 
   Future<List<Map<String, dynamic>>> getCities(String provinceId) async {
-    final response = await http.get(Uri.parse('https://alamat.thecloudalert.com/api/kabkota/get/?d_provinsi_id=$provinceId'));
+    final response = await http.get(Uri.parse('https://api.rajaongkir.com/starter/city?province=$provinceId'), headers: {'key': key});
 
     if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['result'];
-      return data.map((city) => {'id': city['id'], 'name': city['text']}).toList();
+      List data = jsonDecode(response.body)['rajaongkir']['results'];
+      return data.map((city) => {'id': city['city_id'], 'name': city['city_name']}).toList();
     } else {
       throw Exception('Failed to load cities');
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> getDistricts(String cityId) async {
-    final response = await http.get(Uri.parse('https://alamat.thecloudalert.com/api/kecamatan/get/?d_kabkota_id=$cityId'));
-
-    if (response.statusCode == 200) {
-      List data = jsonDecode(response.body)['result'];
-      return data.map((district) => {'id': district['id'], 'name': district['text']}).toList();
-    } else {
-      throw Exception('Failed to load districts');
     }
   }
 
