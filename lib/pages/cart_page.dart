@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/components/quantity_editor.dart';
+import 'package:fp_ppb/pages/checkout_page.dart';
 import 'package:fp_ppb/service/cart_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:intl/intl.dart';
@@ -84,6 +85,26 @@ class _CartPageState extends State<CartPage> {
     totalPrice.value = newTotal;
   }
 
+  void navigateToCheckoutPage() async {
+    try {
+      for (var entry in checkedStates.entries) {
+        if (entry.value) {
+          String documentId = entry.key;
+          int newQuantity = quantities[documentId]!;
+          await cartService.updateCartQuantity(documentId, newQuantity);
+        }
+      }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CheckoutPage(),
+        ),
+      );
+    } catch (e) {
+      showErrorMessage('Failed to update quantities: $e');
+    }
+  }
+
   void showErrorMessage(String message) {
     showDialog(
       context: context,
@@ -96,6 +117,17 @@ class _CartPageState extends State<CartPage> {
               style: const TextStyle(color: Colors.white),
             ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -123,24 +155,29 @@ class _CartPageState extends State<CartPage> {
                   return const Center(child: Text('Your cart is empty'));
                 }
 
-                Map<String, List<DocumentSnapshot>> groupedCartItems = snapshot.data!;
+                Map<String, List<DocumentSnapshot>> groupedCartItems =
+                    snapshot.data!;
 
                 return ListView.builder(
                   itemCount: groupedCartItems.keys.length,
                   itemBuilder: (context, index) {
                     String storeID = groupedCartItems.keys.elementAt(index);
-                    List<DocumentSnapshot> storeCartItems = groupedCartItems[storeID]!;
+                    List<DocumentSnapshot> storeCartItems =
+                        groupedCartItems[storeID]!;
 
                     return Column(
                       children: [
                         FutureBuilder<String>(
                           future: cartService.getStoreName(storeID),
                           builder: (context, storeSnapshot) {
-                            if (storeSnapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
+                            if (storeSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                             if (storeSnapshot.hasError) {
-                              return Center(child: Text('Error: ${storeSnapshot.error}'));
+                              return Center(
+                                  child: Text('Error: ${storeSnapshot.error}'));
                             }
 
                             return Theme(
@@ -157,7 +194,8 @@ class _CartPageState extends State<CartPage> {
                                 ),
                                 initiallyExpanded: true,
                                 children: storeCartItems.map((document) {
-                                  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                                  Map<String, dynamic> data =
+                                      document.data() as Map<String, dynamic>;
                                   String productID = data['productID'];
                                   int quantity = data['quantity'];
                                   bool isChecked = data['isChecked'];
@@ -171,18 +209,27 @@ class _CartPageState extends State<CartPage> {
                                   }
 
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0, vertical: 8.0),
                                     child: FutureBuilder<Map<String, dynamic>>(
-                                      future: productService.getStoreProduct(storeID, productID),
+                                      future: productService.getStoreProduct(
+                                          storeID, productID),
                                       builder: (context, productSnapshot) {
-                                        if (productSnapshot.connectionState == ConnectionState.waiting) {
-                                          return const Center(child: CircularProgressIndicator());
+                                        if (productSnapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
                                         }
                                         if (productSnapshot.hasError) {
-                                          return Center(child: Text('Error: ${productSnapshot.error}'));
+                                          return Center(
+                                              child: Text(
+                                                  'Error: ${productSnapshot.error}'));
                                         }
 
-                                        double productPrice = productSnapshot.data?['productPrice'] ?? 0.0;
+                                        double productPrice = productSnapshot
+                                                .data?['productPrice'] ??
+                                            0.0;
 
                                         return Container(
                                           color: Colors.white38,
@@ -193,40 +240,56 @@ class _CartPageState extends State<CartPage> {
                                               color: Colors.white,
                                               child: Center(
                                                 child: ImageProduct(
-                                                  imageUrl: productSnapshot.data?['imageUrl'],
+                                                  imageUrl: productSnapshot
+                                                      .data?['imageUrl'],
                                                 ),
                                               ),
                                             ),
                                             title: Text(
                                               '${productSnapshot.data?['productName']}',
-                                              style: const TextStyle(fontSize: 14.0),
+                                              style: const TextStyle(
+                                                  fontSize: 14.0),
                                             ),
                                             subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  formatCurrency.format(productPrice),
-                                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                                  formatCurrency
+                                                      .format(productPrice),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
                                                 ),
                                                 Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
                                                   children: [
                                                     IconButton(
                                                       onPressed: () async {
-                                                        await dropProduct(documentId);
+                                                        await dropProduct(
+                                                            documentId);
                                                         setState(() {
-                                                          storeCartItems.remove(document);
+                                                          storeCartItems
+                                                              .remove(document);
                                                         });
                                                       },
-                                                      icon: const Icon(Icons.delete),
+                                                      icon: const Icon(
+                                                          Icons.delete),
                                                       iconSize: 16,
                                                     ),
                                                     Expanded(
                                                       child: QuantityEditor(
-                                                        initialQuantity: quantities[documentId]!,
-                                                        onQuantityChanged: (newQuantity) async {
-                                                          quantities[documentId] = newQuantity;
+                                                        initialQuantity:
+                                                            quantities[
+                                                                documentId]!,
+                                                        onQuantityChanged:
+                                                            (newQuantity) async {
+                                                          quantities[
+                                                                  documentId] =
+                                                              newQuantity;
                                                           await updateTotalPrice();
                                                         },
                                                       ),
@@ -238,8 +301,11 @@ class _CartPageState extends State<CartPage> {
                                             trailing: Checkbox(
                                               value: checkedStates[documentId],
                                               onChanged: (value) async {
-                                                checkedStates[documentId] = value!;
-                                                await cartService.updateCartCheckedState(documentId, value!);
+                                                checkedStates[documentId] =
+                                                    value!;
+                                                await cartService
+                                                    .updateCartCheckedState(
+                                                        documentId, value!);
                                                 await updateTotalPrice();
                                               },
                                             ),
@@ -268,13 +334,16 @@ class _CartPageState extends State<CartPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('Total:',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     ValueListenableBuilder<double>(
                       valueListenable: totalPrice,
                       builder: (context, value, child) {
                         return Text(
                           formatCurrency.format(value),
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         );
                       },
                     ),
@@ -287,7 +356,7 @@ class _CartPageState extends State<CartPage> {
                     if (value > 0) {
                       return MyButton(
                         onTap: () {
-                          // Handle checkout action
+                          navigateToCheckoutPage();
                         },
                         msg: 'Checkout',
                         color: Colors.black,
