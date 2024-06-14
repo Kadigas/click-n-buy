@@ -33,7 +33,7 @@ class ProductService {
         productPrice: double.parse(productPrice),
         productStock: int.parse(productStock),
         productCondition: productCondition,
-        productWeight: productWeight,
+        productWeight: productWeight ?? 1000,
         imageUrl: imageUrl ?? "",
         createdAt: timestamp,
         updatedAt: timestamp);
@@ -48,6 +48,19 @@ class ProductService {
         products.orderBy('createdAt', descending: true).snapshots();
 
     return productStream;
+  }
+
+  Future<Map<String, dynamic>> getProductDetails(String productId) async {
+    try {
+      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productId).get();
+      if (productSnapshot.exists) {
+        return productSnapshot.data() as Map<String, dynamic>;
+      } else {
+        throw Exception("Product not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to get product details: $e");
+    }
   }
 
   Future<void> updateProduct(
@@ -73,7 +86,7 @@ class ProductService {
       productPrice: double.parse(productPrice),
       productStock: int.parse(productStock),
       productCondition: productCondition,
-      productWeight: productWeight,
+      productWeight: productWeight ?? 1000,
       imageUrl: imageUrl ?? "",
       createdAt: createdAt,
       updatedAt: timestamp,
@@ -193,5 +206,33 @@ class ProductService {
         .collection('products')
         .doc(productID)
         .delete();
+  }
+
+  Future<double> getProductPrice(String productID) async {
+    try {
+      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productID).get();
+      if (productSnapshot.exists) {
+        Map<String, dynamic> productData = productSnapshot.data() as Map<String, dynamic>;
+        return productData['productPrice']?.toDouble() ?? 0.0;
+      } else {
+        throw Exception('Product not found');
+      }
+    } catch (e) {
+      throw Exception('Failed to get product price: $e');
+    }
+  }
+
+  Future<int> getProductStock(String productId) async {
+    try {
+      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productId).get();
+      if (productSnapshot.exists) {
+        Map<String, dynamic> productData = productSnapshot.data() as Map<String, dynamic>;
+        return productData['stock'] ?? 0;
+      } else {
+        throw Exception("Product not found");
+      }
+    } catch (e) {
+      throw Exception("Failed to get product stock: $e");
+    }
   }
 }

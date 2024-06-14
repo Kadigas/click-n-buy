@@ -98,10 +98,17 @@ class CartService {
   }
 
   Future<String> getStoreName(String storeID) async {
-    DocumentSnapshot storeDoc =
-        await _firestore.collection('stores').doc(storeID).get();
-    return (storeDoc.data() as Map<String, dynamic>?)?['storeName'] ??
-        'Unknown Store';
+    try {
+      DocumentSnapshot storeSnapshot = await _firestore.collection('stores').doc(storeID).get();
+      if (storeSnapshot.exists) {
+        Map<String, dynamic> storeData = storeSnapshot.data() as Map<String, dynamic>;
+        return storeData['storeName'] ?? 'Unknown Store';
+      } else {
+        return 'Unknown Store';
+      }
+    } catch (e) {
+      return 'Unknown Store';
+    }
   }
 
   Future<double> getPriceForProduct(String productID) async {
@@ -139,5 +146,14 @@ class CartService {
         .collection('cart')
         .doc(productID)
         .delete();
+  }
+
+  Future<Map<String, dynamic>> getStoreDetails(String storeID) async {
+    final storeSnapshot = await FirebaseFirestore.instance.collection('stores').doc(storeID).get();
+    if (storeSnapshot.exists) {
+      return storeSnapshot.data() as Map<String, dynamic>;
+    } else {
+      throw Exception('Store not found');
+    }
   }
 }

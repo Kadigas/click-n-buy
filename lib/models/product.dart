@@ -8,7 +8,7 @@ class Product {
   final double productPrice;
   final int productStock;
   final String productCondition;
-  final String productWeight;
+  final double productWeight;
   final String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
