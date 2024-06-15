@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../components/chat/chat_box.dart';
+import '../../components/chat/progress_dialog.dart';
 import '../../models/users.dart';
 import '../../service/auth_service.dart';
 import '../../service/chat_service.dart';
@@ -34,9 +35,9 @@ class _ChatPageState extends State<ChatPage> {
   final ChatService chatService = ChatService();
   final AuthService authService = AuthService();
   final ImageCloudService imageUploadService = ImageCloudService();
+
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController =
-      ScrollController(); // Initialize ScrollController
+  final ScrollController _scrollController = ScrollController();
 
   bool isEditMode = false;
   String editedMessageId = "";
@@ -49,8 +50,7 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _fetchUserData() async {
-    Users fetchUser = await authService.getDetailUser(widget.userId)
-        as Users; // Ensure authService is accessible here
+    Users fetchUser = await authService.getDetailUser(widget.userId) as Users;
     setState(() {
       user = fetchUser;
     });
@@ -59,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     _messageController.dispose();
-    _scrollController.dispose(); // Dispose the ScrollController
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -83,14 +83,27 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void sendMessage(String userName, String userId,
-      {String? text, MessageType? type, String? imagePath}) async {
+  Future<void> showProgressDialog(BuildContext context, String message) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ProgressDialog(message: message);
+      },
+    );
+  }
+
+  void dismissProgressDialog(BuildContext context) {
+    Navigator.of(context, rootNavigator: true).pop(); // dismiss the progress dialog
+  }
+
+  void sendMessage(String userName, String userId, {String? text, MessageType? type, String? imagePath}) async {
     bool isSeller = widget.isSeller ?? false;
-    String storeId = widget.storeId ?? "";
+    String storeId = widget.storeId;
     if (text?.isNotEmpty == true) {
       await chatService.sendMessage(
         widget.otherUserId,
-        text,
+        text!,
         isSeller,
         storeId,
         userName,
@@ -98,8 +111,6 @@ class _ChatPageState extends State<ChatPage> {
         type: MessageType.text.value,
       );
     } else if (type == MessageType.image && imagePath != null) {
-      // upload the image first to image upload service
-      // if success then will return filename, the filename will use in showing image
       await chatService.sendMessage(
         widget.otherUserId,
         "",
@@ -119,10 +130,13 @@ class _ChatPageState extends State<ChatPage> {
     return await imageUploadService.pickImageFromGallery();
   }
 
-  Future editMessage(
-      String messageId, Map<Object, Object?> editedDataObj) async {
+  Future<void> editMessage(String messageId, Map<Object, Object?> editedDataObj) async {
     await chatService.editMessage(
-        widget.userId, widget.otherUserId, messageId, editedDataObj);
+      widget.userId,
+      widget.otherUserId,
+      messageId,
+      editedDataObj,
+    );
   }
 
   @override
@@ -132,15 +146,13 @@ class _ChatPageState extends State<ChatPage> {
         title: Text(widget.showName),
         centerTitle: true,
         actions: [
-          const Icon(Icons.info),
           IconButton(
             onPressed: () async {
-              await chatService.deleteMessage(
-                  widget.userId, widget.otherUserId);
+              await chatService.deleteMessage(widget.userId, widget.otherUserId);
               Navigator.pop(context);
             },
             icon: const Icon(Icons.delete),
-          )
+          ),
         ],
         backgroundColor: Colors.orangeAccent,
         leading: IconButton(
@@ -155,8 +167,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream:
-                    chatService.getMessages(widget.userId, widget.otherUserId),
+                stream: chatService.getMessages(widget.userId, widget.otherUserId),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {
                     return Center(child: Text("Error: ${snapshot.error}"));
@@ -168,28 +179,24 @@ class _ChatPageState extends State<ChatPage> {
                     return const Center(child: Text("No messages yet"));
                   }
                   var messages = snapshot.data!.docs.map((doc) {
-                    Map<String, dynamic> data =
-                        doc.data() as Map<String, dynamic>;
+                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
                     return ChatBox(
-                        text: data['message'],
-                        isMe: data['senderId'] ==
-                            authService.getCurrentUser()!.uid,
-                        timestamp: data['timestamp'].toDate(),
-                        imageUrl: data['imageLink'],
-                        messageType: data['type'] == 'image'
-                            ? MessageType.image
-                            : MessageType.text,
-                        idMessage: doc.id,
-                        editMessage: editMessage,
-                        isDelete: data['isDelete'],
-                        isEdit: data['isEdit'],
-                        setIsEditMode: setIsEditMode);
+                      text: data['message'],
+                      isMe: data['senderId'] == authService.getCurrentUser()!.uid,
+                      timestamp: data['timestamp'].toDate(),
+                      imageUrl: data['imageLink'],
+                      messageType: data['type'] == 'image' ? MessageType.image : MessageType.text,
+                      idMessage: doc.id,
+                      editMessage: editMessage,
+                      isDelete: data['isDelete'],
+                      isEdit: data['isEdit'],
+                      setIsEditMode: setIsEditMode,
+                    );
                   }).toList();
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _scrollToBottom());
+                  WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
                   return ListView(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                     children: messages,
                   );
                 },
@@ -209,16 +216,42 @@ class _ChatPageState extends State<ChatPage> {
       child: Row(
         children: [
           IconButton(
+            icon: const Icon(Icons.camera_alt),
+            onPressed: () async {
+              try {
+                XFile? image = await imageUploadService.pickImageFromCamera();
+                if (image != null) {
+                  await showProgressDialog(context, 'Uploading...');
+                  String? filename = await imageUploadService.uploadImage(image);
+                  String imageUrl = imageUploadService.getEndpoint(ImageUploadEndpoint.getImageByFilename, arg: filename);
+                  sendMessage(user.username, user.uid, type: MessageType.image, imagePath: imageUrl);
+                  dismissProgressDialog(context);
+                }
+              } catch (e) {
+                dismissProgressDialog(context); // Handle error appropriately
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to upload image')),
+                );
+              }
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.photo),
             onPressed: () async {
-              XFile? image = await pickImage();
-              String? filename = await imageUploadService.uploadImage(image!);
-              String imageUrl = imageUploadService.getEndpoint(
-                  ImageUploadEndpoint.getImageByFilename,
-                  arg: filename);
-              if (image != null) {
-                sendMessage(user.username, user.uid,
-                    type: MessageType.image, imagePath: imageUrl);
+              try {
+                XFile? image = await pickImage();
+                if (image != null) {
+                  await showProgressDialog(context, 'Uploading...');
+                  String? filename = await imageUploadService.uploadImage(image);
+                  String imageUrl = imageUploadService.getEndpoint(ImageUploadEndpoint.getImageByFilename, arg: filename);
+                  sendMessage(user.username, user.uid, type: MessageType.image, imagePath: imageUrl);
+                  dismissProgressDialog(context);
+                }
+              } catch (e) {
+                dismissProgressDialog(context); // Handle error appropriately
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to upload image')),
+                );
               }
             },
           ),
@@ -233,8 +266,7 @@ class _ChatPageState extends State<ChatPage> {
                   borderRadius: BorderRadius.circular(25),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
             ),
           ),
@@ -246,11 +278,9 @@ class _ChatPageState extends State<ChatPage> {
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: () async {
                 if (!isEditMode) {
-                  sendMessage(user.username, user.uid,
-                      text: _messageController.text);
+                  sendMessage(user.username, user.uid, text: _messageController.text);
                 } else {
-                  await editMessage(editedMessageId,
-                      {'message': _messageController.text, 'isEdit': true});
+                  await editMessage(editedMessageId, {'message': _messageController.text, 'isEdit': true});
                   _messageController.clear();
                   setState(() {
                     isEditMode = false;

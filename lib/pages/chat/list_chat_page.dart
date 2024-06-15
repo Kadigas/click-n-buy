@@ -37,8 +37,10 @@ class ListUserPage extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<Map<String, dynamic>> messages = snapshot.data!;
-              if (kDebugMode) {
-                print(messages);
+              if (messages.isEmpty) {
+                return const Center(
+                  child: Text("No chat available"),
+                );
               }
 
               return ListView.builder(
@@ -67,7 +69,10 @@ class ListUserPage extends StatelessWidget {
                         );
                       } else if (!storeNameSnapshot.hasData) {
                         return const ListTile(
-                          title: Text('No data available'),
+                          title: Text(
+                            'No data available',
+                            style: TextStyle(color: Colors.black),
+                          ),
                         );
                       } else {
                         String storeName = storeNameSnapshot.data!;
@@ -92,13 +97,16 @@ class ListUserPage extends StatelessWidget {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700),
                               ),
-                              subtitle: Text(messageType == 'image'? "🖼 photo" :message),
+                              subtitle: Text(messageType == 'image'
+                                  ? "🖼 photo"
+                                  : message),
                               // Customize this as per your user model
                               leading: const Icon(Icons.message),
                             ),
                           ),
                         );
                       }
+                      print("by pass");
                     },
                   );
                 },
