@@ -15,7 +15,7 @@ class ChatPage extends StatefulWidget {
   final String userId;
   final String showName;
   final String otherUserId;
-  final bool? isSeller;
+  final bool isSeller;
   final String storeId;
 
   const ChatPage({
@@ -23,7 +23,7 @@ class ChatPage extends StatefulWidget {
     required this.userId,
     required this.showName,
     required this.otherUserId,
-    this.isSeller,
+    required this.isSeller,
     required this.storeId,
   });
 
@@ -148,7 +148,7 @@ class _ChatPageState extends State<ChatPage> {
         actions: [
           IconButton(
             onPressed: () async {
-              await chatService.deleteMessage(widget.userId, widget.otherUserId);
+              await chatService.deleteMessage(widget.userId, widget.otherUserId, widget.isSeller);
               Navigator.pop(context);
             },
             icon: const Icon(Icons.delete),

@@ -150,12 +150,28 @@ class ChatService {
     }
   }
 
-  Future<void> deleteMessage(String userId, String otherUserId) async {
+  Future<void> deleteMessage(
+      String userId, String otherUserId, bool isSeller) async {
     List<String> ids = [userId, otherUserId];
     ids.sort();
     String chatroomId = ids.join('_');
+    print("chatroom Id $chatroomId");
 
-    await deleteDocumentWithSubcollections('chat_rooms', chatroomId);
+    // if user, send to table user then match with it, so it need to reserve
+    final String collection = isSeller ? "store_chats" : "user_chats";
+    print("is seller $isSeller collection $collection uid $userId others $otherUserId");
+    try {
+      await _firestore
+          .collection(collection)
+          .doc(userId)
+          .collection("messages")
+          .doc(otherUserId)
+          .delete();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error deleting message: $e');
+      }
+    }
   }
 
   Future<void> deleteDocumentWithSubcollections(
