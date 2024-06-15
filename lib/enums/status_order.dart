@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 
-enum CourierCategory {
+enum StatusOrder {
   waitingPayment,
   purchased,
   cancel,
 }
-extension CourierExtension on CourierCategory {
+extension StatusOrderExtension on StatusOrder {
   String get displayName {
     switch (this) {
-      case CourierCategory.waitingPayment:
+      case StatusOrder.waitingPayment:
         return 'Waiting for Payment';
-      case CourierCategory.purchased:
+      case StatusOrder.purchased:
         return 'Purchased';
-      case CourierCategory.cancel:
+      case StatusOrder.cancel:
         return 'Cancelled';
       default:
         return '';
     }
   }
 }
-

@@ -1,17 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fp_ppb/enums/courier.dart';
+import 'package:fp_ppb/enums/status_order.dart';
+import 'package:fp_ppb/enums/status_shipping.dart';
 
-class Order {
+class Orders {
   final String storeID;
-  final String totalPrice;
+  final double totalPrice;
   final String address;
-  final String courier;
-  final String shippingCost;
-  final String statusOrder;
-  final String statusShipping;
+  final CourierCategory courier;
+  final double shippingCost;
+  final StatusOrder statusOrder;
+  final StatusShipping statusShipping;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
-  Order({
+  Orders({
     required this.storeID,
     required this.totalPrice,
     required this.address,
@@ -28,10 +31,10 @@ class Order {
       'storeID': storeID,
       'totalPrice': totalPrice,
       'address': address,
-      'courier': courier,
+      'courier': courier.name,
       'shippingCost': shippingCost,
-      'statusOrder': statusOrder,
-      'statusShipping': statusShipping,
+      'statusOrder': statusOrder.name,
+      'statusShipping': statusShipping.name,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

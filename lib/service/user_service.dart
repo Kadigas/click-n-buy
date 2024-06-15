@@ -52,4 +52,18 @@ class UserService {
       throw Exception('Failed to get city: $e');
     }
   }
+
+  Future<String> getUserAddress(String docID) async {
+    try {
+      DocumentSnapshot snapshot = await users.doc(docID).get();
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        return data['address'];
+      } else {
+        throw Exception('User address not found');
+      }
+    } catch (e) {
+      throw Exception('Failed to get address: $e');
+    }
+  }
 }

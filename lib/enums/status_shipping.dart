@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 
-enum CourierCategory {
+enum StatusShipping {
+  unpaid,
   waitingConfirmation,
   onProcess,
   onShipping,
   arrived,
   finished
 }
-extension CourierExtension on CourierCategory {
+extension StatusShippingExtension on StatusShipping {
   String get displayName {
     switch (this) {
-      case CourierCategory.waitingConfirmation:
+      case StatusShipping.unpaid:
+        return 'Unpaid';
+      case StatusShipping.waitingConfirmation:
         return 'Waiting for Confirmation';
-      case CourierCategory.onProcess:
+      case StatusShipping.onProcess:
         return 'On Process';
-      case CourierCategory.onShipping:
+      case StatusShipping.onShipping:
         return 'On Shipping';
-      case CourierCategory.arrived:
+      case StatusShipping.arrived:
         return 'Arrived';
-      case CourierCategory.finished:
+      case StatusShipping.finished:
         return 'Finished';
       default:
         return '';
     }
   }
 }
-
