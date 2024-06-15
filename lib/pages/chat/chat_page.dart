@@ -17,13 +17,14 @@ class ChatPage extends StatefulWidget {
   final bool? isSeller;
   final String storeId;
 
-  const ChatPage(
-      {super.key,
-      required this.userId,
-      required this.showName,
-      required this.otherUserId,
-      this.isSeller,
-      required this.storeId});
+  const ChatPage({
+    super.key,
+    required this.userId,
+    required this.showName,
+    required this.otherUserId,
+    this.isSeller,
+    required this.storeId,
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -48,12 +49,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _fetchUserData() async {
-    Users fetchUser = await authService.getDetailUser(widget.userId) as Users; // Ensure authService is accessible here
+    Users fetchUser = await authService.getDetailUser(widget.userId)
+        as Users; // Ensure authService is accessible here
     setState(() {
       user = fetchUser;
     });
   }
-
 
   @override
   void dispose() {
@@ -82,7 +83,8 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  void sendMessage(String userName, String userId, {String? text, MessageType? type, String? imagePath}) async {
+  void sendMessage(String userName, String userId,
+      {String? text, MessageType? type, String? imagePath}) async {
     bool isSeller = widget.isSeller ?? false;
     String storeId = widget.storeId ?? "";
     if (text?.isNotEmpty == true) {
@@ -215,7 +217,8 @@ class _ChatPageState extends State<ChatPage> {
                   ImageUploadEndpoint.getImageByFilename,
                   arg: filename);
               if (image != null) {
-                sendMessage(user.username, user.uid ,type: MessageType.image, imagePath: imageUrl);
+                sendMessage(user.username, user.uid,
+                    type: MessageType.image, imagePath: imageUrl);
               }
             },
           ),
@@ -243,7 +246,8 @@ class _ChatPageState extends State<ChatPage> {
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: () async {
                 if (!isEditMode) {
-                  sendMessage(user.username, user.uid, text: _messageController.text);
+                  sendMessage(user.username, user.uid,
+                      text: _messageController.text);
                 } else {
                   await editMessage(editedMessageId,
                       {'message': _messageController.text, 'isEdit': true});
