@@ -236,7 +236,7 @@ class ProductService {
       if (productSnapshot.exists) {
         Map<String, dynamic> productData =
             productSnapshot.data() as Map<String, dynamic>;
-        return productData['stock'] ?? 0;
+        return productData['productStock'] ?? 0;
       } else {
         throw Exception("Product not found");
       }

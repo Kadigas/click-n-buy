@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:fp_ppb/enums/courier.dart';
 import 'package:fp_ppb/service/api_key_service.dart';
 import 'package:fp_ppb/service/auth_service.dart';
+import 'package:fp_ppb/service/order_service.dart';
 import 'package:fp_ppb/service/user_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -21,20 +22,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final CartService cartService = CartService();
   final ProductService productService = ProductService();
   final UserService userService = UserService();
+  final OrderService orderService = OrderService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
   final Map<String, CourierCategory?> selectedCouriers = {};
   final Map<String, double> storeTotals = {};
   final Map<String, List<dynamic>> shippingOptions = {};
   final Map<String, Map<String, dynamic>?> selectedShippingOption = {};
   final Map<String, double> previousShippingCosts = {};
+  final Map<String, double> shippingCosts = {};
   List<Map<String, dynamic>> checkedItems = [];
   double totalAmount = 0.0;
+
   final user = AuthService().getCurrentUser();
 
   @override
   void initState() {
     super.initState();
     fetchCheckedItems();
+  }
+
+  void _loadingState() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
   }
 
   Future<void> fetchCheckedItems() async {
@@ -79,15 +94,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Future<void> fetchShippingOptions(String storeID, CourierCategory courier) async {
+  Future<void> fetchShippingOptions(
+      String storeID, CourierCategory courier) async {
     final storeData = await cartService.getStoreDetails(storeID);
     final destinationID = await userService.getUserCity(user!.uid);
     final courierCode = courier.name;
 
     int totalWeight = 0;
     for (var item in checkedItems.where((item) => item['storeID'] == storeID)) {
-      final productDetails = await productService.getProductDetails(item['data']['productID']);
-      totalWeight += (productDetails['productWeight'] as num).toInt() * (item['data']['quantity'] as num).toInt();
+      final productDetails =
+          await productService.getProductDetails(item['data']['productID']);
+      totalWeight += (productDetails['productWeight'] as num).toInt() *
+          (item['data']['quantity'] as num).toInt();
     }
 
     final response = await http.post(
@@ -128,23 +146,62 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Future<void> checkQuantitiesAndCheckout(String storeID) async {
+  Future<void> checkQuantitiesAndCheckout(String storeID, double storeTotals,
+      CourierCategory courierCategory, double shippingCost) async {
+    _loadingState();
     bool allItemsAvailable = true;
-    List<Map<String, dynamic>> storeItems = checkedItems.where((item) => item['storeID'] == storeID).toList();
+    List<Map<String, dynamic>> storeItems =
+        checkedItems.where((item) => item['storeID'] == storeID).toList();
 
     for (var item in storeItems) {
       String productId = item['data']['productID'];
       int quantity = (item['data']['quantity'] as num).toInt();
       int stock = await productService.getProductStock(productId);
+
       if (quantity > stock) {
         allItemsAvailable = false;
-        showErrorMessage('Item ${item['data']['productName']} is out of stock.');
+        Navigator.of(context, rootNavigator: true).pop();
+        showErrorMessage('There\'s an item that is out of stock.');
+        Navigator.pop(context);
         break;
       }
     }
 
     if (allItemsAvailable) {
-      // Proceed with the checkout process for the specific store
+      try {
+        String address = await userService.getUserAddress(user!.uid);
+        await orderService.addOrder(
+            storeID, storeTotals, address, courierCategory, shippingCost);
+        Navigator.of(context, rootNavigator: true).pop();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Colors.green,
+              title: Center(
+                child: Text(
+                  "Success place an order!",
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        showErrorMessage(e.toString());
+        Navigator.of(context, rootNavigator: true).pop();
+      }
       Navigator.pop(context);
     }
   }
@@ -205,11 +262,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   FutureBuilder<String>(
                     future: cartService.getStoreName(storeID),
                     builder: (context, storeSnapshot) {
-                      if (storeSnapshot.connectionState == ConnectionState.waiting) {
+                      if (storeSnapshot.connectionState ==
+                          ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
                       if (storeSnapshot.hasError) {
-                        return Center(child: Text('Error: ${storeSnapshot.error}'));
+                        return Center(
+                            child: Text('Error: ${storeSnapshot.error}'));
                       }
                       String storeName = storeSnapshot.data ?? 'Unknown Store';
                       return Column(
@@ -217,24 +276,33 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         children: [
                           Text(
                             'Store: $storeName',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Column(
                             children: items.map((item) {
                               Map<String, dynamic> data = item['data'];
                               return FutureBuilder<Map<String, dynamic>>(
-                                future: productService.getProductDetails(data['productID']),
+                                future: productService
+                                    .getProductDetails(data['productID']),
                                 builder: (context, productSnapshot) {
-                                  if (productSnapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                                  if (productSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   }
                                   if (productSnapshot.hasError) {
-                                    return Center(child: Text('Error: ${productSnapshot.error}'));
+                                    return Center(
+                                        child: Text(
+                                            'Error: ${productSnapshot.error}'));
                                   }
-                                  Map<String, dynamic>? productData = productSnapshot.data;
+                                  Map<String, dynamic>? productData =
+                                      productSnapshot.data;
                                   return ListTile(
-                                    title: Text(productData?['productName'] ?? 'Unknown Product'),
-                                    subtitle: Text('Quantity: ${(data['quantity'] as num).toInt()}'),
+                                    title: Text(productData?['productName'] ??
+                                        'Unknown Product'),
+                                    subtitle: Text(
+                                        'Quantity: ${(data['quantity'] as num).toInt()}'),
                                   );
                                 },
                               );
@@ -242,8 +310,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           DropdownButtonFormField<CourierCategory>(
                             value: selectedCouriers[storeID],
-                            decoration: const InputDecoration(labelText: 'Select Courier'),
-                            items: CourierCategory.values.map((CourierCategory courier) {
+                            decoration: const InputDecoration(
+                                labelText: 'Select Courier'),
+                            items: CourierCategory.values
+                                .map((CourierCategory courier) {
                               return DropdownMenuItem<CourierCategory>(
                                 value: courier,
                                 child: Text(courier.displayName),
@@ -262,31 +332,44 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           if (shippingOptions[storeID] != null)
                             DropdownButtonFormField<Map<String, dynamic>>(
                               value: selectedShippingOption[storeID],
-                              decoration: const InputDecoration(labelText: 'Select Shipping Option'),
-                              items: shippingOptions[storeID]!.map<DropdownMenuItem<Map<String, dynamic>>>((option) {
+                              decoration: const InputDecoration(
+                                  labelText: 'Select Shipping Option'),
+                              items: shippingOptions[storeID]!
+                                  .map<DropdownMenuItem<Map<String, dynamic>>>(
+                                      (option) {
                                 return DropdownMenuItem<Map<String, dynamic>>(
                                   value: option,
-                                  child: Text('${option['service']} - ${option['cost'][0]['value']}'),
+                                  child: Text(
+                                      '${option['service']} - ${option['cost'][0]['value']}'),
                                 );
                               }).toList(),
                               onChanged: (value) {
                                 if (value != null) {
                                   setState(() {
                                     selectedShippingOption[storeID] = value;
-                                    double newShippingCost = value['cost'][0]['value']?.toDouble() ?? 0.0;
-                                    updateShippingCost(storeID, newShippingCost);
+                                    double newShippingCost =
+                                        value['cost'][0]['value']?.toDouble() ??
+                                            0.0;
+                                    updateShippingCost(
+                                        storeID, newShippingCost);
+                                    shippingCosts[storeID] = newShippingCost;
                                   });
                                 }
                               },
                             ),
                           Text(
                             'Total: ${formatCurrency.format(storeTotals[storeID] ?? 0)}',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 10),
                           MyButton(
                             onTap: () {
-                              checkQuantitiesAndCheckout(storeID);
+                              checkQuantitiesAndCheckout(
+                                  storeID,
+                                  storeTotals[storeID]!,
+                                  selectedCouriers[storeID]!,
+                                  shippingCosts[storeID]!);
                             },
                             msg: 'Checkout $storeName',
                             color: Colors.black,
@@ -308,7 +391,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: MyButton(
             onTap: () {
               for (var storeID in groupedItems.keys) {
-                checkQuantitiesAndCheckout(storeID);
+                checkQuantitiesAndCheckout(storeID, storeTotals[storeID]!,
+                    selectedCouriers[storeID]!, shippingCosts[storeID]!);
               }
             },
             msg: 'Proceed to Checkout All',
