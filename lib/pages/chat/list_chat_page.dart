@@ -36,22 +36,22 @@ class ListUserPage extends StatelessWidget {
               isSeller, authService.getCurrentUser()!.uid),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<Map<String, dynamic>> users = snapshot.data!;
+              List<Map<String, dynamic>> messages = snapshot.data!;
               if (kDebugMode) {
-                print(users);
+                print(messages);
               }
 
               return ListView.builder(
-                itemCount: users.length,
+                itemCount: messages.length,
                 itemBuilder: (context, index) {
-                  String storeId = users[index]['storeId'];
-                  String message = users[index]['message'];
+                  String storeId = messages[index]['storeId'];
+                  String message = messages[index]['message'];
                   String userId = authService.getCurrentUser()!.uid;
-                  String otherUserId = users[index]['senderId'] != userId? users[index]['senderId']: users[index]['receiverId'];
-                  String clientName = users[index]['userName'];
-                  String clientId = users[index]['userId'];
-                  bool isSeller = users[index]['isSeller'];
-
+                  String otherUserId = messages[index]['senderId'] != userId
+                      ? messages[index]['senderId']
+                      : messages[index]['receiverId'];
+                  String clientName = messages[index]['userName'];
+                  String messageType = messages[index]['type'];
 
                   return FutureBuilder<String>(
                     future: storeService.getStoreName(storeId),
@@ -77,7 +77,7 @@ class ListUserPage extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ChatPage(
-                                  showName:  isSeller? storeName: clientName,
+                                  showName: isSeller ? clientName : storeName,
                                   userId: userId,
                                   otherUserId: otherUserId,
                                   storeId: storeId,
@@ -88,10 +88,11 @@ class ListUserPage extends StatelessWidget {
                           child: Card(
                             child: ListTile(
                               title: Text(
-                                isSeller? storeName: clientName,
-                                style: const TextStyle(fontWeight: FontWeight.w700),
+                                isSeller ? clientName : storeName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700),
                               ),
-                              subtitle: Text(message),
+                              subtitle: Text(messageType == 'image'? "🖼 photo" :message),
                               // Customize this as per your user model
                               leading: const Icon(Icons.message),
                             ),

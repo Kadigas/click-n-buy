@@ -57,7 +57,7 @@ class ChatService {
       storeId: storeId,
       isSeller: isSeller,
       userName: userName,
-      userId: clientId
+      userId: clientId,
     );
     List<String> ids = [currentUserId, receiverId];
     ids.sort();

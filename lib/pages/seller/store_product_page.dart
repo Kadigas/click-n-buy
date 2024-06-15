@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/image_product.dart';
-import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/components/small_button.dart';
 import 'package:fp_ppb/pages/seller/store_show_product.dart';
 import 'package:intl/intl.dart';
@@ -105,7 +104,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ListUserPage(isSeller: false),
+                                      builder: (context) =>
+                                          ListUserPage(isSeller: true),
                                     ),
                                   );
                                 },
@@ -169,7 +169,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ListUserPage(isSeller: true,),
+                                    builder: (context) => ListUserPage(
+                                      isSeller: true,
+                                    ),
                                   ),
                                 );
                               },
@@ -210,45 +212,34 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           child: Column(
                             children: [
                               Card(
-                                child: Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: Container(
-                                        width: 100,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          color: Colors.white
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Center(
-                                            child: ImageProduct(
-                                              imageUrl: imageUrl,
-                                            ),
-                                          ),
-                                        ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      ImageProduct(
+                                        imageUrl: imageUrl,
                                       ),
-                                    ),
-                                    Expanded(
-                                      child: ListTile(
-                                        title: Text(
-                                          productName,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18.0),
-                                        ),
-                                        subtitle: Column(
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            Text(
+                                              productName,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.0,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5),
                                             Text(
                                               price,
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
+                                            const SizedBox(height: 5),
                                             Text('Stock: $productStock'),
                                             const SizedBox(height: 10),
                                             Row(
@@ -279,8 +270,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                                     .number,
                                                             decoration:
                                                                 const InputDecoration(
-                                                                    hintText:
-                                                                        'New Price'),
+                                                              hintText:
+                                                                  'New Price',
+                                                            ),
                                                           ),
                                                           actions: [
                                                             TextButton(
@@ -293,7 +285,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                             ),
                                                             TextButton(
                                                               onPressed: () {
-                                                                String newPrice =
+                                                                String
+                                                                    newPrice =
                                                                     priceController
                                                                         .text;
                                                                 changePrice(
@@ -311,6 +304,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                     );
                                                   },
                                                 ),
+                                                const SizedBox(width: 5),
                                                 SmallButton(
                                                   msg: 'Change Stock',
                                                   color: Colors.black,
@@ -321,7 +315,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                         final stockController =
                                                             TextEditingController();
                                                         stockController.text =
-                                                            productStock.toString();
+                                                            productStock
+                                                                .toString();
                                                         return AlertDialog(
                                                           title: const Text(
                                                               'Change Stock'),
@@ -333,8 +328,9 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                                     .number,
                                                             decoration:
                                                                 const InputDecoration(
-                                                                    hintText:
-                                                                        'New Stock'),
+                                                              hintText:
+                                                                  'New Stock',
+                                                            ),
                                                           ),
                                                           actions: [
                                                             TextButton(
@@ -347,7 +343,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                             ),
                                                             TextButton(
                                                               onPressed: () {
-                                                                String newStock =
+                                                                String
+                                                                    newStock =
                                                                     stockController
                                                                         .text;
                                                                 changeStock(
@@ -367,14 +364,11 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                                 ),
                                               ],
                                             ),
-                                            const SizedBox(
-                                              height: 10,
-                                            ),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                               const SizedBox(
