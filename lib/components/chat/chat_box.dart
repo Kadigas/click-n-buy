@@ -40,7 +40,7 @@ class _ChatBoxState extends State<ChatBox> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onDoubleTap: () {
+      onLongPress: () {
         if (widget.isMe) {
           showModalBottomSheet(
               context: context,

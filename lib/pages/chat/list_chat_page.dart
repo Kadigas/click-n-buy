@@ -86,6 +86,7 @@ class ListUserPage extends StatelessWidget {
                                   userId: userId,
                                   otherUserId: otherUserId,
                                   storeId: storeId,
+                                  isSeller: isSeller,
                                 ),
                               ),
                             );
