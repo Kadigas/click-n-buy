@@ -46,20 +46,20 @@ class _QuantityEditorState extends State<QuantityEditor> {
         IconButton(
           icon: const Icon(Icons.remove),
           onPressed: _decreaseQuantity,
-          iconSize: 16,
+          iconSize: 14,
         ),
         Container(
           color: Colors.white,
           child: Center(
               child: Text(
             '$_quantity',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 14),
           )),
         ),
         IconButton(
           icon: const Icon(Icons.add),
           onPressed: _increaseQuantity,
-          iconSize: 16,
+          iconSize: 14    ,
         ),
       ],
     );

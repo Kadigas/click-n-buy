@@ -6,9 +6,10 @@ class CartService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final AuthService _auth = AuthService();
 
-  Future<void> addToCart(String storeID, String productID) async {
+  Future<void> addToCart(String storeID, String productID, String productMinimumQuantity) async {
     late int qty;
     late Timestamp createdAt;
+    final int minimumQuantity = int.parse(productMinimumQuantity);
 
     final currentUser = _auth.getCurrentUser();
 
@@ -42,7 +43,7 @@ class CartService {
           .get();
 
       if (!cartSnapshot.exists) {
-        qty = 1;
+        qty = minimumQuantity;
         createdAt = timestamp;
       } else {
         Map<String, dynamic> cartData =

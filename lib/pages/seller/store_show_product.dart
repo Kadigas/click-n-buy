@@ -113,6 +113,7 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
               enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
           String productStock = data['productStock'].toString();
+          String productMinimumQuantity = data['productMinimumQuantity'].toString();
           String? imageUrl = data['imageUrl'];
           ProductCondition productCondition =
               enumService.parseProductCondition(data['productCondition']);
@@ -155,6 +156,8 @@ class _StoreShowProductPageState extends State<StoreShowProductPage> {
                     Text('Condition: ${productCondition.displayName}'),
                     const SizedBox(height: 5),
                     Text('Stock: $productStock'),
+                    const SizedBox(height: 5),
+                    Text('Minimum purchase: $productMinimumQuantity'),
                     const SizedBox(height: 5),
                     const Divider(thickness: 1.0, color: Colors.grey),
                     const SizedBox(height: 5),

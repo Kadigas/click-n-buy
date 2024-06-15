@@ -22,6 +22,7 @@ class ProductService {
       productStock,
       productCondition,
       productWeight,
+      productMinimumQuantity,
       String? imageUrl) {
     final Timestamp timestamp = Timestamp.now();
 
@@ -33,7 +34,8 @@ class ProductService {
         productPrice: double.parse(productPrice),
         productStock: int.parse(productStock),
         productCondition: productCondition,
-        productWeight: productWeight ?? 1000,
+        productWeight: double.parse(productWeight) ?? 1000,
+        productMinimumQuantity: int.parse(productMinimumQuantity) ?? 1,
         imageUrl: imageUrl ?? "",
         createdAt: timestamp,
         updatedAt: timestamp);
@@ -52,7 +54,8 @@ class ProductService {
 
   Future<Map<String, dynamic>> getProductDetails(String productId) async {
     try {
-      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productId).get();
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('products').doc(productId).get();
       if (productSnapshot.exists) {
         return productSnapshot.data() as Map<String, dynamic>;
       } else {
@@ -73,6 +76,7 @@ class ProductService {
     productStock,
     productCondition,
     productWeight,
+    productMinimumQuantity,
     String? imageUrl,
     Timestamp createdAt,
   ) {
@@ -86,7 +90,8 @@ class ProductService {
       productPrice: double.parse(productPrice),
       productStock: int.parse(productStock),
       productCondition: productCondition,
-      productWeight: productWeight ?? 1000,
+      productWeight: double.parse(productWeight) ?? 100,
+      productMinimumQuantity: int.parse(productMinimumQuantity) ?? 1,
       imageUrl: imageUrl ?? "",
       createdAt: createdAt,
       updatedAt: timestamp,
@@ -210,9 +215,11 @@ class ProductService {
 
   Future<double> getProductPrice(String productID) async {
     try {
-      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productID).get();
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('products').doc(productID).get();
       if (productSnapshot.exists) {
-        Map<String, dynamic> productData = productSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> productData =
+            productSnapshot.data() as Map<String, dynamic>;
         return productData['productPrice']?.toDouble() ?? 0.0;
       } else {
         throw Exception('Product not found');
@@ -224,9 +231,11 @@ class ProductService {
 
   Future<int> getProductStock(String productId) async {
     try {
-      DocumentSnapshot productSnapshot = await _firestore.collection('products').doc(productId).get();
+      DocumentSnapshot productSnapshot =
+          await _firestore.collection('products').doc(productId).get();
       if (productSnapshot.exists) {
-        Map<String, dynamic> productData = productSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> productData =
+            productSnapshot.data() as Map<String, dynamic>;
         return productData['stock'] ?? 0;
       } else {
         throw Exception("Product not found");

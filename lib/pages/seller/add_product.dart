@@ -25,6 +25,7 @@ class _AddProductPageState extends State<AddProductPage> {
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
   final productWeightController = TextEditingController();
+  final productMinimumQuantityController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
   String? imageUrl;
@@ -55,6 +56,7 @@ class _AddProductPageState extends State<AddProductPage> {
         productStockController.text,
         selectedCondition.toString().split('.').last,
         productWeightController.text,
+        productMinimumQuantityController.text,
         imageUrl,
       );
       String productId = productDocRef.id;
@@ -214,8 +216,20 @@ class _AddProductPageState extends State<AddProductPage> {
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
+                    controller: productWeightController,
+                    decoration: const InputDecoration(labelText: 'Product Weight (grams)'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
                     controller: productStockController,
                     decoration: const InputDecoration(labelText: 'Stock'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: productMinimumQuantityController,
+                    decoration: const InputDecoration(labelText: 'Minimum Purchase'),
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 10),

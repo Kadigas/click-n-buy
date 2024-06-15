@@ -128,7 +128,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Future<void> updateQuantitiesAndCheckout(String storeID) async {
+  Future<void> checkQuantitiesAndCheckout(String storeID) async {
     bool allItemsAvailable = true;
     List<Map<String, dynamic>> storeItems = checkedItems.where((item) => item['storeID'] == storeID).toList();
 
@@ -286,7 +286,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const SizedBox(height: 10),
                           MyButton(
                             onTap: () {
-                              updateQuantitiesAndCheckout(storeID);
+                              checkQuantitiesAndCheckout(storeID);
                             },
                             msg: 'Checkout $storeName',
                             color: Colors.black,
@@ -308,7 +308,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           child: MyButton(
             onTap: () {
               for (var storeID in groupedItems.keys) {
-                updateQuantitiesAndCheckout(storeID);
+                checkQuantitiesAndCheckout(storeID);
               }
             },
             msg: 'Proceed to Checkout All',

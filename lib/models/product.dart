@@ -9,6 +9,7 @@ class Product {
   final int productStock;
   final String productCondition;
   final double productWeight;
+  final int productMinimumQuantity;
   final String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
@@ -22,6 +23,7 @@ class Product {
     required this.productStock,
     required this.productCondition,
     required this.productWeight,
+    required this.productMinimumQuantity,
     this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
@@ -37,6 +39,7 @@ class Product {
       'productStock': productStock,
       'productCondition': productCondition,
       'productWeight': productWeight,
+      'productMinimumQuantity': productMinimumQuantity,
       'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,

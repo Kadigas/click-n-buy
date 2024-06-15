@@ -61,7 +61,8 @@ class _ShowProductPageState extends State<ShowProductPage> {
     );
   }
 
-  Future<void> addToCart(String storeID, productID) async {
+  Future<void> addToCart(
+      String storeID, productID, productMinimumQuantity) async {
     final cartService = CartService();
     _loadingState();
 
@@ -69,6 +70,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
       await cartService.addToCart(
         storeID,
         productID,
+        productMinimumQuantity,
       );
       Navigator.of(context, rootNavigator: true).pop();
     } on FirebaseAuthException catch (e) {
@@ -130,6 +132,8 @@ class _ShowProductPageState extends State<ShowProductPage> {
           ProductCategory productCategory =
               enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
+          String productMinimumQuantity =
+              data['productMinimumQuantity'].toString();
           ProductCondition productCondition =
               enumService.parseProductCondition(data['productCondition']);
 
@@ -212,6 +216,11 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                   const SizedBox(height: 10),
                                   Text(
                                       'Condition: ${productCondition.displayName}'),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                      'Minimum purchase: $productMinimumQuantity'),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -317,12 +326,11 @@ class _ShowProductPageState extends State<ShowProductPage> {
                             msg: 'Add to Cart',
                             color: Colors.black,
                             onTap: () async {
-                              await addToCart(widget.storeID, widget.productID);
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(
+                              await addToCart(widget.storeID, widget.productID,
+                                  productMinimumQuantity);
+                              ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text(
-                                        'Succeeded add to cart!')),
+                                    content: Text('Succeeded add to cart!')),
                               );
                             },
                           ),

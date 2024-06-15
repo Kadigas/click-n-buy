@@ -278,7 +278,7 @@ class _CartPageState extends State<CartPage> {
                                                       },
                                                       icon: const Icon(
                                                           Icons.delete),
-                                                      iconSize: 16,
+                                                      iconSize: 14,
                                                     ),
                                                     Expanded(
                                                       child: QuantityEditor(

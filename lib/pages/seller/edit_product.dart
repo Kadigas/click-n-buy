@@ -29,6 +29,7 @@ class _EditProductPageState extends State<EditProductPage> {
   final productDescriptionController = TextEditingController();
   final productPriceController = TextEditingController();
   final productStockController = TextEditingController();
+  final productMinimumQuantityController = TextEditingController();
   ProductCategory? selectedCategory;
   ProductCondition? selectedCondition;
   final productWeightController = TextEditingController();
@@ -93,6 +94,7 @@ class _EditProductPageState extends State<EditProductPage> {
         productStockController.text,
         selectedCondition.toString().split('.').last,
         productWeightController.text,
+        productMinimumQuantityController.text,
         imageUrl,
         createdAt,
       );
@@ -147,6 +149,8 @@ class _EditProductPageState extends State<EditProductPage> {
         productDescriptionController.text = data['productDescription'];
         productPriceController.text = data['productPrice'].toInt().toString();
         productStockController.text = data['productStock'].toString();
+        productMinimumQuantityController.text = data['productMinimumQuantity'].toString();
+        productWeightController.text = data['productWeight'].toString();
         selectedCategory = getCategoryFromString(data['productCategory']);
         selectedCondition = getConditionFromString(data['productCondition']);
         imageUrl = data['imageUrl'];
@@ -286,8 +290,20 @@ class _EditProductPageState extends State<EditProductPage> {
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
+                      controller: productWeightController,
+                      decoration: const InputDecoration(labelText: 'Product Weight (grams)'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
                       controller: productStockController,
                       decoration: const InputDecoration(labelText: 'Stock'),
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: productMinimumQuantityController,
+                      decoration: const InputDecoration(labelText: 'Minimum Purchase'),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 10),
