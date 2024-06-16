@@ -216,8 +216,13 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Row(
                                     children: [
-                                      ImageProduct(
-                                        imageUrl: imageUrl,
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        color: Colors.white,
+                                        child: ImageProduct(
+                                          imageUrl: imageUrl,
+                                        ),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
