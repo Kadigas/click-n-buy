@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/transparent_button.dart';
+import 'package:fp_ppb/pages/seller/store_edit_profile_page.dart';
 import 'package:fp_ppb/pages/seller/store_product_page.dart';
 import 'package:fp_ppb/pages/seller/store_transaction_page.dart';
+import 'package:fp_ppb/service/location_cloud_service.dart';
 
 class StoreProfilePage extends StatefulWidget {
   const StoreProfilePage({super.key});
@@ -14,15 +17,29 @@ class StoreProfilePage extends StatefulWidget {
 
 class _StoreProfilePageState extends State<StoreProfilePage> {
   late Future<QuerySnapshot> _document;
+  late String uid;
+  final locationCloudService = LocationCloudService();
 
   @override
   void initState() {
     super.initState();
-    String uid = FirebaseAuth.instance.currentUser!.uid;
+    _fetchData();
+  }
+
+  void _fetchData() {
+    uid = FirebaseAuth.instance.currentUser!.uid;
     _document = FirebaseFirestore.instance
         .collection('stores')
         .where('sellerUid', isEqualTo: uid)
         .get();
+  }
+
+  Future<String?> _getCityName(String provinceId, String cityId) async {
+    try {
+      return await locationCloudService.getCityName(provinceId, cityId);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -47,96 +64,142 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
 
           var data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
           String storeName = data['storeName'];
+          String provinceId = data['province'];
+          String cityId = data['city'];
+          String? imageUrl = data['imageUrl'];
           String storeID = snapshot.data!.docs.first.id;
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+          return FutureBuilder<String?>(
+            future: _getCityName(provinceId, cityId),
+            builder: (context, citySnapshot) {
+              if (citySnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (citySnapshot.hasError) {
+                return Center(child: Text('Error: ${citySnapshot.error}'));
+              }
+              String storeCity = citySnapshot.data ?? 'Unknown City';
+
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GridView.count(
+                              shrinkWrap: true,
+                              crossAxisCount: 3,
+                              childAspectRatio: 1,
+                              children: [
+                                Center(
+                                  child: SizedBox(
+                                    width: 80,
+                                    height: 80,
+                                    child: imageUrl != null
+                                        ? ClipOval(
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: ImageProduct(imageUrl: imageUrl),
+                                      ),
+                                    )
+                                        : const Icon(
+                                      Icons.account_circle,
+                                      size: 80,
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      storeName,
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.location_on_sharp,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(
+                                          width: 2,
+                                        ),
+                                        Text(storeCity),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            StoreEditProfilePage(storeID: storeID),
+                                      ),
+                                    );
+                                    setState(() {
+                                      _fetchData();
+                                    });
+                                  },
+                                  icon: const Icon(Icons.settings),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        decoration: const BoxDecoration(color: Colors.white),
+                        child: Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              const Icon(
-                                Icons.account_circle,
-                                size: 125,
+                              TransparentButton(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          StoreProductPage(storeID: storeID),
+                                    ),
+                                  );
+                                },
+                                msg: 'My Products',
                               ),
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    storeName,
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.settings),
+                              TransparentButton(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                      const StoreTransactionPage(),
+                                    ),
+                                  );
+                                },
+                                msg: 'Transactions',
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      )
+                    ],
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TransparentButton(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      StoreProductPage(storeID: storeID),
-                                ),
-                              );
-                            },
-                            msg: 'My Products',
-                          ),
-                          TransparentButton(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const StoreTransactionPage(),
-                                ),
-                              );
-                            },
-                            msg: 'Transactions',
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),

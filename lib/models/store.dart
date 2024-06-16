@@ -4,7 +4,9 @@ class Store {
   final String sellerUid;
   final String email;
   final String storeName;
-  final String address;
+  String? address;
+  final String province;
+  final String city;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -12,7 +14,9 @@ class Store {
     required this.sellerUid,
     required this.email,
     required this.storeName,
-    required this.address,
+    this.address,
+    required this.province,
+    required this.city,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -22,7 +26,9 @@ class Store {
       'sellerUid': sellerUid,
       'email': email,
       'storeName': storeName,
-      'address': address,
+      'address': address ?? "",
+      'province': province,
+      'city': city,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

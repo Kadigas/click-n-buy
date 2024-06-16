@@ -10,8 +10,8 @@ class ChatBox extends StatefulWidget {
   final String? imageUrl;
   final MessageType messageType;
   final String idMessage;
-  final Function(String messageId,
-      Map<Object, Object?> editedDataObj) editMessage;
+  final Function(String messageId, Map<Object, Object?> editedDataObj)
+      editMessage;
   final bool isDelete;
   final bool isEdit;
   final Function(String messageText, String messageId) setIsEditMode;
@@ -26,7 +26,8 @@ class ChatBox extends StatefulWidget {
     required this.idMessage,
     required this.editMessage,
     required this.isDelete,
-    required this.isEdit, required this.setIsEditMode,
+    required this.isEdit,
+    required this.setIsEditMode,
   });
 
   @override
@@ -39,35 +40,38 @@ class _ChatBoxState extends State<ChatBox> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onDoubleTap: () {
-        showModalBottomSheet(
-            context: context,
-            builder: (BuildContext context) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  if (widget.messageType != MessageType.image &&
-                      !widget.isDelete)
-                    ListTile(
-                      leading: const Icon(Icons.edit),
-                      title: const Text('Edit'),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        widget.setIsEditMode(widget.text!, widget.idMessage);
-                      },
-                    ),
-                  if (!widget.isDelete)
-                    ListTile(
-                      leading: const Icon(Icons.delete),
-                      title: const Text('Delete'),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        await widget.editMessage(widget.idMessage, {'isDelete': true});
-                      },
-                    ),
-                ],
-              );
-            });
+      onLongPress: () {
+        if (widget.isMe) {
+          showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    if (widget.messageType != MessageType.image &&
+                        !widget.isDelete)
+                      ListTile(
+                        leading: const Icon(Icons.edit),
+                        title: const Text('Edit'),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          widget.setIsEditMode(widget.text!, widget.idMessage);
+                        },
+                      ),
+                    if (!widget.isDelete)
+                      ListTile(
+                        leading: const Icon(Icons.delete),
+                        title: const Text('Delete'),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await widget.editMessage(
+                              widget.idMessage, {'isDelete': true});
+                        },
+                      ),
+                  ],
+                );
+              });
+        }
       },
       child: Column(
         crossAxisAlignment:

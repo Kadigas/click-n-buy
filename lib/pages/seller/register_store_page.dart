@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/big_button.dart';
+import 'package:fp_ppb/components/custom_dropdown.dart';
 import 'package:fp_ppb/pages/seller/store_profile_page.dart';
+import 'package:fp_ppb/service/location_cloud_service.dart';
 import 'package:fp_ppb/service/store_service.dart';
 import 'package:fp_ppb/service/user_service.dart';
 
@@ -14,11 +16,18 @@ class RegisterStorePage extends StatefulWidget {
 }
 
 class _RegisterStorePageState extends State<RegisterStorePage> {
-  final emailController = TextEditingController();
+  late String email;
   final storeNameController = TextEditingController();
   final addressController = TextEditingController();
+  String? selectedCity;
+  String? selectedProvince;
 
   late Future<DocumentSnapshot> _userDocument;
+
+  List<Map<String, dynamic>> provinces = [];
+  List<Map<String, dynamic>> cities = [];
+
+  final locationCloudService = LocationCloudService();
 
   @override
   void initState() {
@@ -26,16 +35,37 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     _userDocument =
         FirebaseFirestore.instance.collection('users').doc(uid).get();
-    _userDocument.then((snapshot) {
+    _userDocument.then((snapshot) async {
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        emailController.text = data['email'];
+        email = data['email'];
         addressController.text = data['address'];
+        selectedCity = data['city'];
+        selectedProvince = data['province'];
+
+        // Fetch and set cities for the initially saved province
+        if (selectedProvince != null) {
+          List<Map<String, dynamic>> fetchedCities =
+              await locationCloudService.getCities(selectedProvince!);
+          setState(() {
+            cities = fetchedCities;
+          });
+        }
       }
+    });
+
+    locationCloudService.getProvinces().then((provinces) {
+      setState(() {
+        this.provinces = provinces;
+      });
     });
   }
 
   void registerStore() async {
+    if (!validateFields()) {
+      return;
+    }
+
     final StoreService storeService = StoreService();
     final UserService userService = UserService();
     String uid = FirebaseAuth.instance.currentUser!.uid;
@@ -50,13 +80,11 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
     );
 
     try {
-      await storeService.registerStore(
-        emailController.text,
-        storeNameController.text,
-        addressController.text,
-      );
+      await storeService.registerStore(email, storeNameController.text,
+          addressController.text, selectedCity!, selectedProvince!);
       await userService.updateHasStore(uid);
       Navigator.of(context, rootNavigator: true).pop();
+      Navigator.of(context).pop();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -67,6 +95,22 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
       Navigator.pop(context);
       showErrorMessage(e.code);
     }
+  }
+
+  bool validateFields() {
+    if(addressController.text == null) {
+      showErrorMessage("Address cannot be empty!");
+      return false;
+    }
+    if (selectedProvince == null) {
+      showErrorMessage("Province cannot be empty!");
+      return false;
+    }
+    if (selectedCity == null) {
+      showErrorMessage("City cannot be empty!");
+      return false;
+    }
+    return true;
   }
 
   void showErrorMessage(String message) {
@@ -118,26 +162,69 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
           return SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Form(
                   child: Column(
                     children: [
                       TextFormField(
+                        initialValue: email,
+                        readOnly: true,
+                        style: const TextStyle(color: Colors.grey),
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: TextStyle(color: Colors.grey),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
                         controller: storeNameController,
-                        decoration: InputDecoration(labelText: 'Store Name'),
+                        decoration:
+                            const InputDecoration(labelText: 'Store Name'),
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: addressController,
-                        decoration: InputDecoration(labelText: 'Address'),
+                        decoration: const InputDecoration(labelText: 'Address'),
                       ),
                       const SizedBox(height: 10),
-                      TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
-                        keyboardType: TextInputType.number,
+                      buildDropdownButtonFormField(
+                        selectedValue: selectedProvince,
+                        label: 'Province',
+                        items: provinces,
+                        onChanged: (value) async {
+                          setState(() {
+                            selectedProvince = value;
+                            selectedCity =
+                                null;
+                            cities = [];
+                          });
+                          if (value != null) {
+                            List<Map<String, dynamic>> fetchedCities =
+                                await locationCloudService.getCities(value);
+                            setState(() {
+                              cities = fetchedCities;
+                            });
+                          }
+                        },
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      buildDropdownButtonFormField(
+                        selectedValue: selectedCity,
+                        label: 'City',
+                        items: cities,
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCity = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       BigButton(
                         onTap: () {
                           registerStore();
@@ -154,5 +241,12 @@ class _RegisterStorePageState extends State<RegisterStorePage> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    storeNameController.dispose();
+    addressController.dispose();
+    super.dispose();
   }
 }

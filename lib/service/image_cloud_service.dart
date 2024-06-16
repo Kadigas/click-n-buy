@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:fp_ppb/enums/image_cloud_endpoint.dart';
 import 'package:http/http.dart' as http;

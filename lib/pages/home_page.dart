@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
-
-import 'package:fp_ppb/pages/list_user_page.dart';
+import 'package:fp_ppb/pages/cart_page.dart';
+import 'package:fp_ppb/pages/chat/list_chat_page.dart';
 import 'package:fp_ppb/pages/show_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:fp_ppb/service/store_service.dart';
 import 'package:intl/intl.dart';
-import 'package:fp_ppb/pages/cart_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -90,24 +90,29 @@ class _HomePageState extends State<HomePage> {
                               obscureText: false,
                             ),
                           ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const CartPage()),
+                                  );
+                                },
+                                icon: const Icon(Icons.shopping_cart),
+                              ),
+                              IconButton(
+                                onPressed: showSignOutDialog,
+                                icon: const Icon(Icons.logout),
+                              ),
+                            ],
+                          ),
                           IconButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => CartPage()),
-                              );
-                            },
-                            icon: const Icon(Icons.shopping_cart),
-                          ),
-                          IconButton(
-                            onPressed: showSignOutDialog,
-                            icon: const Icon(Icons.logout),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ListUserPage()),
+                                MaterialPageRoute(
+                                    builder: (context) => ListUserPage(isSeller: false,)),
                               );
                             },
                             icon: const Icon(Icons.chat),
@@ -148,24 +153,29 @@ class _HomePageState extends State<HomePage> {
                             obscureText: false,
                           ),
                         ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const CartPage()),
+                                );
+                              },
+                              icon: const Icon(Icons.shopping_cart),
+                            ),
+                            IconButton(
+                              onPressed: showSignOutDialog,
+                              icon: const Icon(Icons.logout),
+                            ),
+                          ],
+                        ),
                         IconButton(
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => CartPage()),
-                            );
-                          },
-                          icon: const Icon(Icons.shopping_cart),
-                        ),
-                        IconButton(
-                          onPressed: showSignOutDialog,
-                          icon: const Icon(Icons.logout),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ListUserPage()),
+                              MaterialPageRoute(
+                                  builder: (context) => ListUserPage(isSeller: false)),
                             );
                           },
                           icon: const Icon(Icons.chat),
@@ -173,20 +183,30 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(height: 20),
+                    const Text(
+                      'Featured Products',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: productList.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.59,
+                        childAspectRatio: 0.55,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
                       itemBuilder: (context, index) {
                         DocumentSnapshot document = productList[index];
                         String productID = document.id;
-                        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                        Map<String, dynamic> data =
+                        document.data() as Map<String, dynamic>;
                         String productName = data['productName'];
                         double productPrice = data['productPrice'];
                         String storeID = data['storeID'];
@@ -206,63 +226,111 @@ class _HomePageState extends State<HomePage> {
                             );
                           },
                           child: Card(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Stack(
                               children: [
-                                Expanded(child: ImageProduct(imageUrl: imageUrl)),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-                                  child: Text(
-                                    productName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
-                                  child: Text(
-                                    price,
-                                  ),
-                                ),
-                                const Divider(
-                                  thickness: 1.0,
-                                  color: Colors.grey,
-                                ),
-                                FutureBuilder<String>(
-                                  future: storeService.getStoreName(storeID),
-                                  builder: (context, storeSnapshot) {
-                                    if (storeSnapshot.connectionState == ConnectionState.waiting) {
-                                      return const Center(child: CircularProgressIndicator());
-                                    }
-                                    if (storeSnapshot.hasError) {
-                                      return Center(child: Text('Error: ${storeSnapshot.error}'));
-                                    }
-                                    return Padding(
-                                      padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.storefront,
-                                            size: 16,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(12),
+                                              topRight: Radius.circular(12)
                                           ),
-                                          const SizedBox(
-                                            width: 2,
-                                          ),
-                                          Text(
-                                            storeSnapshot.data ?? 'Unknown Store',
-                                          ),
-                                        ],
+                                          color: Colors.white,
+                                        ),
+                                        child: Center(
+                                          child: ImageProduct(imageUrl: imageUrl),
+                                        ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 10, 5, 5),
+                                      child: Text(
+                                        productName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 2, 2, 2),
+                                      child: Text(
+                                        price,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    FutureBuilder<String>(
+                                      future:
+                                      storeService.getStoreName(storeID),
+                                      builder: (context, storeSnapshot) {
+                                        if (storeSnapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const Center(
+                                              child:
+                                              CircularProgressIndicator());
+                                        }
+                                        if (storeSnapshot.hasError) {
+                                          return Center(
+                                              child: Text(
+                                                  'Error: ${storeSnapshot.error}'));
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              10, 2, 2, 2),
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.storefront,
+                                                size: 16,
+                                              ),
+                                              const SizedBox(
+                                                width: 2,
+                                              ),
+                                              Text(
+                                                storeSnapshot.data ??
+                                                    'Unknown Store',
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(
+                                      height: 35,
+                                    ),
+                                  ],
                                 ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.more_horiz),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                )
                               ],
                             ),
                           ),
                         );
                       },
+                    ),
+                    const SizedBox(
+                      height: 30,
                     ),
                   ],
                 ),

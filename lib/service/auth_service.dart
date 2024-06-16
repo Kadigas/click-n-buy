@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fp_ppb/models/users.dart';
 
 class AuthService {
@@ -10,22 +11,47 @@ class AuthService {
     return _auth.currentUser;
   }
 
-  Future<UserCredential> signInWithEmailPassword(String email, password) async {
+  Future<Users?> getDetailUser(String uid) async {
+    try {
+      // Fetch user document from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      // Check if the document exists
+      if (!userDoc.exists) {
+        return null;
+      }
+
+      // Create a Users instance from the document data
+      Users user = Users.fromDocument(userDoc);
+      return user;
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error fetching user: $e");
+      }
+      return null;
+    }
+  }
+
+  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-
-      // save user info if it doesn't exist
-      // _firestore.collection("users").doc(userCredential.user!.uid).set(
-      //   {
-      //     "uid": userCredential.user!.uid,
-      //     'email': email
-      //   }
-      // );
-
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.code);
+      switch (e.code) {
+        case 'invalid-credential':
+          throw Exception('Incorrect email or password!');
+        case 'invalid-email':
+          throw Exception('Invalid email address.');
+        case 'user-disabled':
+          throw Exception('This user has been disabled.');
+        case 'user-not-found':
+          throw Exception('No user found with this email.');
+        case 'wrong-password':
+          throw Exception('Incorrect password.');
+        default:
+          throw Exception('An unknown error occurred.');
+      }
     }
   }
 
@@ -52,7 +78,6 @@ class AuthService {
           firstName: firstName,
           lastName: lastName,
           hasStore: false,
-          address: '',
           createdAt: timestamp,
           updatedAt: timestamp,
       );

@@ -7,7 +7,10 @@ class Users {
   final String firstName;
   final String lastName;
   final bool hasStore;
-  final String address;
+  String? address;
+  String? province;
+  String? city;
+  String? imageUrl;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
@@ -18,10 +21,31 @@ class Users {
     required this.firstName,
     required this.lastName,
     required this.hasStore,
-    required this.address,
+    this.address,
+    this.province,
+    this.city,
+    this.imageUrl,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  factory Users.fromDocument(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return Users(
+      uid: data['uid'],
+      email: data['email'],
+      username: data['username'],
+      firstName: data['firstName'],
+      lastName: data['lastName'],
+      hasStore: data['hasStore'],
+      address: data['address'],
+      province: data['province'],
+      city: data['city'],
+      imageUrl: data['imageUrl'],
+      createdAt: data['createdAt'],
+      updatedAt: data['updatedAt'],
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -31,7 +55,10 @@ class Users {
       'firstName': firstName,
       'lastName': lastName,
       'hasStore': hasStore,
-      'address': address,
+      'address': address ?? "",
+      'province': province ?? "",
+      'city': city ?? "",
+      'imageUrl': imageUrl ?? "",
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
