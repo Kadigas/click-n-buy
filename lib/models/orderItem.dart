@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class OrderItem {
   final String storeID;
   final String productID;
+  final double productPrice;
   final int quantity;
-  final bool isChecked;
   final Timestamp createdAt;
   final Timestamp updatedAt;
 
   OrderItem({
     required this.storeID,
     required this.productID,
+    required this.productPrice,
     required this.quantity,
-    required this.isChecked,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -21,8 +21,8 @@ class OrderItem {
     return {
       'storeID': storeID,
       'productID': productID,
+      'productPrice': productPrice,
       'quantity': quantity,
-      'isChecked': isChecked,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
