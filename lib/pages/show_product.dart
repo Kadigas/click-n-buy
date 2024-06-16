@@ -13,7 +13,6 @@ import '../components/image_product.dart';
 
 class ShowProductPage extends StatefulWidget {
   final String productID;
-
   final String storeID;
 
   const ShowProductPage(
@@ -58,6 +57,14 @@ class _ShowProductPageState extends State<ShowProductPage> {
       },
     );
   }
+
+  void addToCart() {
+    FirebaseFirestore.instance.collection('cart').add({
+      'productID': widget.productID,
+      'storeID': widget.storeID,
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +179,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                           MyButton(
                             msg: 'Add to Cart',
                             color: Colors.black,
-                            onTap: () {},
+                            onTap: addToCart,
                           ),
                           const SizedBox(
                             width: 10,

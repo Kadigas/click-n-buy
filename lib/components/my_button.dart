@@ -9,7 +9,7 @@ class MyButton extends StatelessWidget {
     super.key,
     required this.onTap,
     required this.msg,
-    required this.color
+    required this.color,
   });
 
   @override

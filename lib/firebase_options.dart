@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'fp-ppb-7d450',
     storageBucket: 'fp-ppb-7d450.appspot.com',
   );
+
 }

@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/components/image_product.dart';
 import 'package:fp_ppb/components/my_textfield.dart';
+
 import 'package:fp_ppb/pages/list_user_page.dart';
 import 'package:fp_ppb/pages/show_product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 import 'package:fp_ppb/service/store_service.dart';
 import 'package:intl/intl.dart';
+import 'package:fp_ppb/pages/cart_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -88,24 +90,24 @@ class _HomePageState extends State<HomePage> {
                               obscureText: false,
                             ),
                           ),
-                          Row(
-                            children: [
-                              IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.shopping_cart),
-                              ),
-                              IconButton(
-                                onPressed: showSignOutDialog,
-                                icon: const Icon(Icons.logout),
-                              ),
-                            ],
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => CartPage()),
+                              );
+                            },
+                            icon: const Icon(Icons.shopping_cart),
+                          ),
+                          IconButton(
+                            onPressed: showSignOutDialog,
+                            icon: const Icon(Icons.logout),
                           ),
                           IconButton(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => ListUserPage()),
+                                MaterialPageRoute(builder: (context) => ListUserPage()),
                               );
                             },
                             icon: const Icon(Icons.chat),
@@ -146,24 +148,24 @@ class _HomePageState extends State<HomePage> {
                             obscureText: false,
                           ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.shopping_cart),
-                            ),
-                            IconButton(
-                              onPressed: showSignOutDialog,
-                              icon: const Icon(Icons.logout),
-                            ),
-                          ],
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => CartPage()),
+                            );
+                          },
+                          icon: const Icon(Icons.shopping_cart),
+                        ),
+                        IconButton(
+                          onPressed: showSignOutDialog,
+                          icon: const Icon(Icons.logout),
                         ),
                         IconButton(
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => ListUserPage()),
+                              MaterialPageRoute(builder: (context) => ListUserPage()),
                             );
                           },
                           icon: const Icon(Icons.chat),
@@ -175,8 +177,7 @@ class _HomePageState extends State<HomePage> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: productList.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.59,
                         crossAxisSpacing: 10,
@@ -185,8 +186,7 @@ class _HomePageState extends State<HomePage> {
                       itemBuilder: (context, index) {
                         DocumentSnapshot document = productList[index];
                         String productID = document.id;
-                        Map<String, dynamic> data =
-                            document.data() as Map<String, dynamic>;
+                        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
                         String productName = data['productName'];
                         double productPrice = data['productPrice'];
                         String storeID = data['storeID'];
@@ -209,11 +209,9 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                    child: ImageProduct(imageUrl: imageUrl)),
+                                Expanded(child: ImageProduct(imageUrl: imageUrl)),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 5, 5, 5),
+                                  padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
                                   child: Text(
                                     productName,
                                     style: const TextStyle(
@@ -223,8 +221,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(10, 2, 2, 2),
+                                  padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
                                   child: Text(
                                     price,
                                   ),
@@ -236,31 +233,25 @@ class _HomePageState extends State<HomePage> {
                                 FutureBuilder<String>(
                                   future: storeService.getStoreName(storeID),
                                   builder: (context, storeSnapshot) {
-                                    if (storeSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const Center(
-                                          child: CircularProgressIndicator());
+                                    if (storeSnapshot.connectionState == ConnectionState.waiting) {
+                                      return const Center(child: CircularProgressIndicator());
                                     }
                                     if (storeSnapshot.hasError) {
-                                      return Center(
-                                          child: Text(
-                                              'Error: ${storeSnapshot.error}'));
+                                      return Center(child: Text('Error: ${storeSnapshot.error}'));
                                     }
                                     return Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          10, 2, 2, 2),
+                                      padding: const EdgeInsets.fromLTRB(10, 2, 2, 2),
                                       child: Row(
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             Icons.storefront,
                                             size: 16,
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 2,
                                           ),
                                           Text(
-                                            storeSnapshot.data ??
-                                                'Unknown Store',
+                                            storeSnapshot.data ?? 'Unknown Store',
                                           ),
                                         ],
                                       ),
