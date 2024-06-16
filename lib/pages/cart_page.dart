@@ -85,7 +85,7 @@ class _CartPageState extends State<CartPage> {
     totalPrice.value = newTotal;
   }
 
-  void navigateToCheckoutPage() async {
+  Future<void> navigateToCheckoutPage() async {
     try {
       for (var entry in checkedStates.entries) {
         if (entry.value) {
@@ -319,8 +319,8 @@ class _CartPageState extends State<CartPage> {
                   builder: (context, value, child) {
                     if (value > 0) {
                       return MyButton(
-                        onTap: () {
-                          navigateToCheckoutPage();
+                        onTap: () async {
+                          await navigateToCheckoutPage();
                         },
                         msg: 'Checkout',
                         color: Colors.black,

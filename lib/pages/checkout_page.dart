@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/enums/courier.dart';
 import 'package:fp_ppb/service/api_key_service.dart';
 import 'package:fp_ppb/service/auth_service.dart';
@@ -123,7 +124,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
 
     if (response.statusCode == 200) {
-      print(response.body);
       final data = jsonDecode(response.body);
       setState(() {
         shippingOptions[storeID] = data['rajaongkir']['results'][0]['costs'];
@@ -148,15 +148,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Future<void> checkQuantitiesAndCheckout(String storeID, double storeTotals,
       CourierCategory courierCategory, double shippingCost) async {
-    _loadingState();
     bool allItemsAvailable = true;
     List<Map<String, dynamic>> storeItems =
         checkedItems.where((item) => item['storeID'] == storeID).toList();
+    Map<String, int> stocks = {};
 
     for (var item in storeItems) {
-      String productId = item['data']['productID'];
+      String productID = item['data']['productID'];
       int quantity = (item['data']['quantity'] as num).toInt();
-      int stock = await productService.getProductStock(productId);
+      int stock = await productService.getProductStock(productID);
+      stocks[productID] = stock;
 
       if (quantity > stock) {
         allItemsAvailable = false;
@@ -170,39 +171,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
     if (allItemsAvailable) {
       try {
         String address = await userService.getUserAddress(user!.uid);
-        await orderService.addOrder(
+        DocumentReference orderDocRef = await orderService.addOrder(
             storeID, storeTotals, address, courierCategory, shippingCost);
-        Navigator.of(context, rootNavigator: true).pop();
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              backgroundColor: Colors.green,
-              title: Center(
-                child: Text(
-                  "Success place an order!",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text(
-                    'OK',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+        for (var item in storeItems) {
+          String productID = item['data']['productID'];
+          int quantity = (item['data']['quantity'] as num).toInt();
+          int newStock = stocks[productID]! - quantity;
+          print(newStock);
+          await orderService.addOrderItem(
+              orderDocRef.id, storeID, productID, quantity);
+          await cartService.deleteCartProduct(productID);
+          await productService.updateProductStock(
+              productID, newStock.toString());
+          await productService.updateStoreProductStock(
+              storeID, productID, newStock.toString());
+        }
       } catch (e) {
         showErrorMessage(e.toString());
-        Navigator.of(context, rootNavigator: true).pop();
       }
-      Navigator.pop(context);
     }
   }
 
@@ -212,6 +198,34 @@ class _CheckoutPageState extends State<CheckoutPage> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.red,
+          title: Center(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSuccessMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.green,
           title: Center(
             child: Text(
               message,
@@ -364,12 +378,17 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           const SizedBox(height: 10),
                           MyButton(
-                            onTap: () {
-                              checkQuantitiesAndCheckout(
+                            onTap: () async {
+                              _loadingState();
+                              await checkQuantitiesAndCheckout(
                                   storeID,
                                   storeTotals[storeID]!,
                                   selectedCouriers[storeID]!,
                                   shippingCosts[storeID]!);
+                              Navigator.of(context, rootNavigator: true).pop();
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              showSuccessMessage("Success place an order!");
                             },
                             msg: 'Checkout $storeName',
                             color: Colors.black,
@@ -389,11 +408,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
         child: SizedBox(
           height: 50,
           child: MyButton(
-            onTap: () {
+            onTap: () async {
+              _loadingState();
               for (var storeID in groupedItems.keys) {
-                checkQuantitiesAndCheckout(storeID, storeTotals[storeID]!,
+                await checkQuantitiesAndCheckout(storeID, storeTotals[storeID]!,
                     selectedCouriers[storeID]!, shippingCosts[storeID]!);
               }
+              Navigator.of(context, rootNavigator: true).pop();
+              Navigator.pop(context);
+              Navigator.pop(context);
+              showSuccessMessage("Success place an order!");
             },
             msg: 'Proceed to Checkout All',
             color: Colors.black,
