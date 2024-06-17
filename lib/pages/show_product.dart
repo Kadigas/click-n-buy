@@ -33,6 +33,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
   final EnumService enumService = EnumService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
   final AuthService _authService = AuthService();
+  late String currentUser;
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .collection('stores')
         .doc(widget.storeID)
         .get();
+    currentUser = _authService.getCurrentUser()!.uid;
   }
 
   void _loadingState() {
@@ -62,8 +64,8 @@ class _ShowProductPageState extends State<ShowProductPage> {
     );
   }
 
-  Future<void> addToCart(
-      String storeID, productID, productMinimumQuantity) async {
+  Future<void> addToCart(String storeID, productID,
+      productMinimumQuantity) async {
     final cartService = CartService();
     _loadingState();
 
@@ -80,13 +82,17 @@ class _ShowProductPageState extends State<ShowProductPage> {
     }
   }
 
-  Future<void> addToWishlist(String storeID, String productID, String productMinimumQuantity) async {
+  Future<void> addToWishlist(String storeID, String productID,
+      String productMinimumQuantity) async {
     final wishlistService = WishlistService();
     _loadingState();
 
     try {
       // Fetch additional product details
-      DocumentSnapshot productSnapshot = await FirebaseFirestore.instance.collection('products').doc(productID).get();
+      DocumentSnapshot productSnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(productID)
+          .get();
       if (!productSnapshot.exists) {
         throw Exception('Product not found');
       }
@@ -130,6 +136,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
       },
     );
   }
+
   //
   // void addToCart() {
   //   FirebaseFirestore.instance.collection('cart').add({
@@ -137,7 +144,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
   //     'storeID': widget.storeID,
   //   });
   // }
-
 
   @override
   Widget build(BuildContext context) {
@@ -168,17 +174,17 @@ class _ShowProductPageState extends State<ShowProductPage> {
           }
 
           Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
+          snapshot.data!.data() as Map<String, dynamic>;
           String productName = data['productName'];
           String productDescription = data['productDescription'];
           String? imageUrl = data['imageUrl'];
           ProductCategory productCategory =
-              enumService.parseProductCategory(data['productCategory']);
+          enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
           String productMinimumQuantity =
-              data['productMinimumQuantity'].toString();
+          data['productMinimumQuantity'].toString();
           ProductCondition productCondition =
-              enumService.parseProductCondition(data['productCondition']);
+          enumService.parseProductCondition(data['productCondition']);
 
           return FutureBuilder<DocumentSnapshot>(
             future: _storeDocument,
@@ -194,7 +200,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
               }
 
               Map<String, dynamic> data =
-                  snapshot.data!.data() as Map<String, dynamic>;
+              snapshot.data!.data() as Map<String, dynamic>;
               String storeName = data['storeName'];
               String storeId = snapshot.data!.id.toString();
               String sellerUid = data['sellerUid'];
@@ -221,7 +227,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                     height: 300,
                                     child: Center(
                                         child:
-                                            ImageProduct(imageUrl: imageUrl)),
+                                        ImageProduct(imageUrl: imageUrl)),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -255,10 +261,12 @@ class _ShowProductPageState extends State<ShowProductPage> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                      'Category: ${productCategory.displayName}'),
+                                      'Category: ${productCategory
+                                          .displayName}'),
                                   const SizedBox(height: 10),
                                   Text(
-                                      'Condition: ${productCondition.displayName}'),
+                                      'Condition: ${productCondition
+                                          .displayName}'),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -335,6 +343,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          if (currentUser != sellerUid)
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
@@ -347,10 +356,11 @@ class _ShowProductPageState extends State<ShowProductPage> {
                             child: Center(
                                 child: IconButton(
                                     onPressed: () {
-                                      Navigator.push(
+                                          Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                              builder: (context) => ChatPage(
+                                              builder: (context) =>
+                                                  ChatPage(
                                                     showName: storeName,
                                                     userId: _authService
                                                         .getCurrentUser()!
@@ -393,11 +403,12 @@ class _ShowProductPageState extends State<ShowProductPage> {
                             msg: 'Add to Wishlist',
                             color: Colors.redAccent,
                             onTap: () async {
-                              await addToWishlist(widget.storeID, widget.productID,
-                                  productMinimumQuantity);
+                              await addToWishlist(widget.storeID,
+                                  widget.productID, productMinimumQuantity);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text('Succeeded add to wishlist!')),
+                                    content:
+                                    Text('Succeeded add to wishlist!')),
                               );
                             },
                           )
