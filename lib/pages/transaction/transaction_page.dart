@@ -190,7 +190,7 @@ class _TransactionPageState extends State<TransactionPage> {
                                                 child: ListTile(
                                                   title: Text(product.productName),
                                                   subtitle: Text("Quantity: ${orderItem.quantity}"),
-                                                  trailing: Text("Price: \₽${orderItem.productPrice}"),
+                                                  trailing: Text("Price: ${formatCurrency.format(order.totalPrice)}"),
                                                 ),
                                               );
                                             }
