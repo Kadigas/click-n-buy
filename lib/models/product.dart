@@ -29,6 +29,7 @@ class Product {
     required this.updatedAt,
   });
 
+  // Method to convert a Product instance to a Map
   Map<String, dynamic> toMap() {
     return {
       'storeID': storeID,
@@ -44,5 +45,23 @@ class Product {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
+  }
+
+  // Factory constructor to create a Product instance from a Map
+  factory Product.fromMap(Map<String, dynamic> map) {
+    return Product(
+      storeID: map['storeID'],
+      productName: map['productName'],
+      productDescription: map['productDescription'],
+      productCategory: map['productCategory'],
+      productPrice: map['productPrice'],
+      productStock: map['productStock'],
+      productCondition: map['productCondition'],
+      productWeight: map['productWeight'].toDouble(),
+      productMinimumQuantity: map['productMinimumQuantity'],
+      imageUrl: map['imageUrl'],
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
+    );
   }
 }

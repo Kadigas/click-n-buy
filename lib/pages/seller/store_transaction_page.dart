@@ -25,11 +25,11 @@ class _StoreOrdersPageState extends State<StoreOrdersPage> {
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   Future<List<StoreOrders>> fetchStoreOrders() async {
-    List<StoreOrders> storeOrders = await orderService.fetchStoreOrders(widget.storeID);
+    List<StoreOrders> storeOrders = await orderService.fetchStoreOrders(
+        widget.storeID);
     storeOrders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return storeOrders;
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

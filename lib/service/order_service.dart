@@ -11,6 +11,37 @@ import 'package:fp_ppb/service/auth_service.dart';
 class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Future<Orders> getOrderByUserId(String userId, )
+  Stream<List<Map<String, dynamic>>> getTransactions(String userId) {
+    return _firestore
+        .collection("users")
+        .doc(userId)
+        .collection("orders")
+        .orderBy("createdAt", descending: false)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        var data = doc.data();
+        data['id'] = doc.id; // Add document ID to the data map
+        return data;
+      }).toList();
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getOrderItems(
+      String userId, String orderId) {
+    return _firestore
+        .collection("users")
+        .doc(userId)
+        .collection("orders")
+        .doc(orderId)
+        .collection("orderItems")
+        .orderBy("createdAt", descending: false)
+        .snapshots()
+        .map((querySnapshot) =>
+            querySnapshot.docs.map((doc) => doc.data()).toList());
+  }
+
   Future<DocumentReference> addOrder(String storeID, double totalPrice,
       String address, CourierCategory courier, double shippingCost) {
     final Timestamp timestamp = Timestamp.now();
@@ -35,22 +66,22 @@ class OrderService {
         .add(newOrder.toMap());
   }
 
-  Future<void> addOrderItem(
-      String orderID, String storeID, String productID, int quantity) async {
+  Future<void> addOrderItem(String orderID, String storeID, String productID,
+      int quantity) async {
     final Timestamp timestamp = Timestamp.now();
 
     final User user = AuthService().getCurrentUser()!;
 
     try {
       DocumentSnapshot productSnapshot =
-          await _firestore.collection('products').doc(productID).get();
+      await _firestore.collection('products').doc(productID).get();
 
       if (!productSnapshot.exists) {
         throw Exception('Product not found');
       }
 
       Map<String, dynamic> productData =
-          productSnapshot.data() as Map<String, dynamic>;
+      productSnapshot.data() as Map<String, dynamic>;
       double price = productData['productPrice'];
 
       OrderItem orderItem = OrderItem(
@@ -72,6 +103,37 @@ class OrderService {
           .set(orderItem.toMap());
     } catch (e) {
       throw Exception('Failed to add to cart: $e');
+    }
+  }
+
+  Future<List<DocumentSnapshot>> getUserOrders() async {
+    final User user = AuthService().getCurrentUser()!;
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('orders')
+        .get();
+
+    print('Fetched ${querySnapshot.docs.length} orders for user ${user.uid}');
+    return querySnapshot.docs;
+  }
+
+
+  Future<String> getStoreName(String storeID) async {
+    try {
+      DocumentSnapshot storeSnapshot = await _firestore.collection('stores')
+          .doc(storeID)
+          .get();
+      if (storeSnapshot.exists) {
+        Map<String, dynamic> storeData = storeSnapshot.data() as Map<
+            String,
+            dynamic>;
+        return storeData['storeName'] ?? 'Unknown Store';
+      } else {
+        return 'Unknown Store';
+      }
+    } catch (e) {
+      return 'Unknown Store';
     }
   }
 

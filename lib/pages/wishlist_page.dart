@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/service/wishlist_service.dart';
 import 'package:intl/intl.dart';
 import '../models/wishlist.dart';
-import '../pages/show_product.dart'; // Import your ShowProductPage
+import '../pages/show_product.dart';
 
 class WishlistPage extends StatefulWidget {
   @override

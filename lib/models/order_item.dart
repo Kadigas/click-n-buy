@@ -38,4 +38,16 @@ class OrderItem {
       'updatedAt': updatedAt,
     };
   }
+
+  // Factory constructor to create an OrderItem instance from a Map
+  factory OrderItem.fromMap(Map<String, dynamic> map) {
+    return OrderItem(
+      storeID: map['storeID'],
+      productID: map['productID'],
+      productPrice: map['productPrice'],
+      quantity: map['quantity'],
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
+    );
+  }
 }
