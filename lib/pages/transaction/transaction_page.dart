@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/models/order_item.dart';
 import 'package:fp_ppb/models/product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/order_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
-
-import '../../models/orderItem.dart';
+import 'package:intl/intl.dart';
 import '../../models/orders.dart';
 import '../../service/store_service.dart';
 
@@ -21,6 +21,7 @@ class _TransactionPageState extends State<TransactionPage> {
   final OrderService _order = OrderService();
   final StoreService _store = StoreService();
   final ProductService _product = ProductService();
+  final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
 
   late User user;
 
@@ -56,7 +57,6 @@ class _TransactionPageState extends State<TransactionPage> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<Map<String, dynamic>> transactions = snapshot.data!;
-              print(snapshot.data.toString());
               if (transactions.isEmpty) {
                 return const Center(child: Text("transaction is empty"));
               }
@@ -88,18 +88,35 @@ class _TransactionPageState extends State<TransactionPage> {
                         } else {
                           final String storeName = storeNameSnapshot.data!;
                           return ExpansionTile(
-                              title: Row(children: [
-                                Text(storeName),
-                                Card(
+                              title: Row(
+                                children: [
+                                  Text(storeName),
+                                  Card(
                                     child: Container(
-                                        margin: const EdgeInsets.only(left: 5),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 3, vertical: 5),
-                                        child:
-                                            Text(order.totalPrice.toString())))
-                              ]),
-                              subtitle:
-                                  Text("status: ${order.statusOrder.name}"),
+                                      margin: const EdgeInsets.only(left: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 3, vertical: 5),
+                                      child: Text(
+                                        formatCurrency
+                                            .format(order.totalPrice),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                      "status payment: ${order.statusOrder.name}"),
+                                  Text(
+                                      "status shipping: ${order.statusShipping.name}"),
+                                  if (order.receiptNumber != null)
+                                    Text(
+                                        "Receipt number: ${order.receiptNumber}"),
+                                ],
+                              ),
                               children: [
                                 StreamBuilder(
                                     stream:
@@ -156,10 +173,14 @@ class _TransactionPageState extends State<TransactionPage> {
                                                           'No product in this order.'),
                                                     );
                                                   } else {
-                                                    Product product = Product.fromMap(productSnapshot.data!);
+                                                    Product product =
+                                                        Product.fromMap(
+                                                            productSnapshot
+                                                                .data!);
                                                     return Card(
                                                       child: ListTile(
-                                                        title: Text(product.productName),
+                                                        title: Text(product
+                                                            .productName),
                                                         subtitle: Text(
                                                             "Quantity: ${orderItem.quantity}"),
                                                         trailing: Text(

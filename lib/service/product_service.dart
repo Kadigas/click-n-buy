@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fp_ppb/models/product.dart';
-import 'package:fp_ppb/models/storeProduct.dart';
+import 'package:fp_ppb/models/store_product.dart';
 
 class ProductService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -52,10 +52,10 @@ class ProductService {
     return productStream;
   }
 
-  Future<Map<String, dynamic>> getProductDetails(String productId) async {
+  Future<Map<String, dynamic>> getProductDetails(String productID) async {
     try {
       DocumentSnapshot productSnapshot =
-          await _firestore.collection('products').doc(productId).get();
+          await _firestore.collection('products').doc(productID).get();
       if (productSnapshot.exists) {
         return productSnapshot.data() as Map<String, dynamic>;
       } else {
@@ -138,7 +138,7 @@ class ProductService {
     return productDoc.data() as Map<String, dynamic>? ?? {};
   }
 
-  Future<void> addStoreProduct(String storeID, productId, productName,
+  Future<void> addStoreProduct(String storeID, productID, productName,
       productPrice, productStock, String? imageUrl) {
     final Timestamp timestamp = Timestamp.now();
 
@@ -153,7 +153,7 @@ class ProductService {
         .collection('stores')
         .doc(storeID)
         .collection('products')
-        .doc(productId)
+        .doc(productID)
         .set(newProduct.toMap());
   }
 
@@ -229,10 +229,10 @@ class ProductService {
     }
   }
 
-  Future<int> getProductStock(String productId) async {
+  Future<int> getProductStock(String productID) async {
     try {
       DocumentSnapshot productSnapshot =
-          await _firestore.collection('products').doc(productId).get();
+          await _firestore.collection('products').doc(productID).get();
       if (productSnapshot.exists) {
         Map<String, dynamic> productData =
             productSnapshot.data() as Map<String, dynamic>;
