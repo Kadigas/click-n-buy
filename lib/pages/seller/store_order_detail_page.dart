@@ -82,7 +82,26 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Order Details'),
+        title: const Text(
+          'Order Details',
+          style: TextStyle(color: Colors.white),
+        ),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green, Colors.greenAccent],
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _userFuture,
@@ -126,7 +145,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 children: [
                   Container(
                     width: double.infinity,
-                    color: Colors.blue,
+                    color: Colors.black,
                     padding: const EdgeInsets.all(16),
                     child: const Text(
                       'Customer Information',
@@ -163,7 +182,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ),
                   Container(
                     width: double.infinity,
-                    color: Colors.blue,
+                    color: Colors.black,
                     padding: const EdgeInsets.all(16),
                     child: const Text(
                       'Purchased Items',

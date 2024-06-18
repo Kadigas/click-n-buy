@@ -24,12 +24,13 @@ class _WishlistPageState extends State<WishlistPage> {
       appBar: AppBar(
         title: const Text(
           'Wishlist',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white70),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
+        centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF3366FF), Color(0xFF00CCFF)],
+              colors: [Colors.blueAccent, Color(0xFF00CCFF)],
             ),
           ),
         ),

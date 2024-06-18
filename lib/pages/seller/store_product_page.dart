@@ -43,13 +43,19 @@ class _StoreProductPageState extends State<StoreProductPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'My Products',
+          'My Products', style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.white,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green, Colors.greenAccent],
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: Colors.white,
           ),
           onPressed: () {
             Navigator.pop(context);
