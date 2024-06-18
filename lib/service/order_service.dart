@@ -5,6 +5,7 @@ import 'package:fp_ppb/enums/status_order.dart';
 import 'package:fp_ppb/enums/status_shipping.dart';
 import 'package:fp_ppb/models/orderItem.dart';
 import 'package:fp_ppb/models/orders.dart';
+import 'package:fp_ppb/models/storeOrders.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
 class OrderService {
@@ -34,8 +35,8 @@ class OrderService {
         .add(newOrder.toMap());
   }
 
-  Future<void> addOrderItem(
-      String orderID, String storeID, String productID, int quantity) async {
+  Future<void> addOrderItem(String orderID, String storeID, String productID,
+      int quantity) async {
     final Timestamp timestamp = Timestamp.now();
 
     final User user = AuthService().getCurrentUser()!;
@@ -89,9 +90,13 @@ class OrderService {
 
   Future<String> getStoreName(String storeID) async {
     try {
-      DocumentSnapshot storeSnapshot = await _firestore.collection('stores').doc(storeID).get();
+      DocumentSnapshot storeSnapshot = await _firestore.collection('stores')
+          .doc(storeID)
+          .get();
       if (storeSnapshot.exists) {
-        Map<String, dynamic> storeData = storeSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic> storeData = storeSnapshot.data() as Map<
+            String,
+            dynamic>;
         return storeData['storeName'] ?? 'Unknown Store';
       } else {
         return 'Unknown Store';
@@ -99,5 +104,23 @@ class OrderService {
     } catch (e) {
       return 'Unknown Store';
     }
+  }
+
+  Future<void> addStoreOrder(String userID, storeID, orderID) async {
+    final Timestamp timestamp = Timestamp.now();
+
+    StoreOrders newOrder = StoreOrders(
+      userID: userID,
+      orderID: orderID,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    );
+
+    await _firestore
+        .collection('stores')
+        .doc(storeID)
+        .collection('orders')
+        .doc(orderID)
+        .set(newOrder.toMap());
   }
 }
