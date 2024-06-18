@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fp_ppb/components/my_button.dart';
 import 'package:fp_ppb/enums/product_category.dart';
 import 'package:fp_ppb/enums/product_condition.dart';
@@ -33,7 +31,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
   final EnumService enumService = EnumService();
   final formatCurrency = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp');
   final AuthService _authService = AuthService();
-  late String currentUser;
 
   @override
   void initState() {
@@ -50,7 +47,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
         .collection('stores')
         .doc(widget.storeID)
         .get();
-    currentUser = _authService.getCurrentUser()!.uid;
   }
 
   void _loadingState() {
@@ -137,14 +133,6 @@ class _ShowProductPageState extends State<ShowProductPage> {
     );
   }
 
-  //
-  // void addToCart() {
-  //   FirebaseFirestore.instance.collection('cart').add({
-  //     'productID': widget.productID,
-  //     'storeID': widget.storeID,
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,6 +169,7 @@ class _ShowProductPageState extends State<ShowProductPage> {
           ProductCategory productCategory =
           enumService.parseProductCategory(data['productCategory']);
           String productPrice = formatCurrency.format(data['productPrice']);
+          int productStock = data['productStock'];
           String productMinimumQuantity =
           data['productMinimumQuantity'].toString();
           ProductCondition productCondition =
@@ -214,209 +203,216 @@ class _ShowProductPageState extends State<ShowProductPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 25.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    width: 380,
-                                    height: 300,
-                                    child: Center(
-                                        child:
-                                        ImageProduct(imageUrl: imageUrl)),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                    productPrice,
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    productName,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Divider(
-                                    thickness: 1.0,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    'Product Details',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                      'Category: ${productCategory
-                                          .displayName}'),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                      'Condition: ${productCondition
-                                          .displayName}'),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                      'Minimum purchase: $productMinimumQuantity'),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Divider(
-                                    thickness: 1.0,
-                                    color: Colors.grey,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    'Product Description',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(productDescription),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                ],
-                              ),
-                            ),
+                        Container(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 25.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                            SizedBox(
+                            width: 380,
+                            height: 300,
+                            child: Center(
+                                child:
+                                ImageProduct(imageUrl: imageUrl)),
                           ),
                           const SizedBox(
-                            height: 15,
+                            height: 10,
                           ),
-                          Container(
-                            color: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(
-                                  25.0, 25.0, 25.0, 25),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    Icons.account_circle,
-                                    size: 50,
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    storeName,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18.0),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          Text(
+                            productPrice,
+                            style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            productName,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 10),
+                          const Divider(
+                            thickness: 1.0,
+                            color: Colors.grey,
                           ),
                           const SizedBox(
-                            height: 25,
+                            height: 10,
+                          ),
+                          const Text(
+                            'Product Details',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                              'Category: ${productCategory.displayName}'),
+                          const SizedBox(height: 10),
+                          Text(
+                              'Condition: ${productCondition.displayName}'),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Text('Stock: $productStock'),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          productStock > 0
+                              ? Text(
+                              'Minimum purchase: $productMinimumQuantity')
+                              : const Text(
+                            'This product is unavailable to purchase due to out of stock.',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Divider(
+                          thickness: 1.0,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          'Product Description',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Text(productDescription),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                          25.0, 25.0, 25.0, 25),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.account_circle,
+                            size: 50,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            storeName,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 5,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (currentUser != sellerUid)
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 1),
-                            decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Center(
-                                child: IconButton(
-                                    onPressed: () {
-                                          Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ChatPage(
-                                                    showName: storeName,
-                                                    userId: _authService
-                                                        .getCurrentUser()!
-                                                        .uid,
-                                                    otherUserId: sellerUid,
-                                                    isSeller: false,
-                                                    storeId: storeId,
-                                                  )));
-                                    },
-                                    icon: const Icon(Icons.message))),
-                          ),
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          MyButton(
-                            msg: 'Add to Cart',
-                            color: Colors.black,
-                            // onTap: addToCart,
-                            onTap: () async {
-                              await addToCart(widget.storeID, widget.productID,
-                                  productMinimumQuantity);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Succeeded add to cart!')),
-                              );
-                            },
-                          ),
-                          // const SizedBox(
-                          //   width: 5,
-                          // ),
-                          // MyButton(
-                          //   msg: 'Buy Now',
-                          //   color: Colors.green,
-                          //   onTap: () {},
-                          // ),
-                          const SizedBox(
-                            width: 3,
-                          ),
-                          MyButton(
-                            msg: 'Add to Wishlist',
-                            color: Colors.redAccent,
-                            onTap: () async {
-                              await addToWishlist(widget.storeID,
-                                  widget.productID, productMinimumQuantity);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                    Text('Succeeded add to wishlist!')),
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
+                  const SizedBox(
+                    height: 25,
                   ),
                 ],
+              ),
+              ),
+              ),
+              Positioned(
+              bottom: 5,
+              left: 0,
+              right: 0,
+              child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              Container(
+              margin: const EdgeInsets.symmetric(horizontal: 1),
+              decoration: BoxDecoration(
+              color: Colors.transparent,
+              border: Border.all(
+              color: Colors.grey,
+              width: 1.0,
+              ),
+              borderRadius: BorderRadius.circular(8)),
+              child: Center(
+              child: IconButton(
+              onPressed: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => ChatPage(
+              showName: storeName,
+              userId: _authService
+                  .getCurrentUser()!
+                  .uid,
+              otherUserId: sellerUid,
+              isSeller: false,
+              storeId: storeId,
+              )));
+              },
+              icon: const Icon(Icons.message))),
+              ),
+              const SizedBox(
+              width: 5,
+              ),
+              productStock > 0
+              ? MyButton(
+              msg: 'Add to Cart',
+              color: Colors.black,
+              onTap: () async {
+              await addToCart(
+              widget.storeID,
+              widget.productID,
+              productMinimumQuantity);
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+              content:
+              Text('Succeeded add to cart!')),
+              );
+              },
+              )
+                  : MyButton(
+              onTap: () {},
+              msg: 'Add to Cart',
+              color: Colors.grey),
+              const SizedBox(
+              width: 3,
+              ),
+              MyButton(
+              msg: 'Add to Wishlist',
+              color: Colors.redAccent,
+              onTap: () async {
+              await addToWishlist(widget.storeID,
+              widget.productID, productMinimumQuantity);
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+              content:
+              Text('Succeeded add to wishlist!')),
+              );
+              },
+              )
+              ],
+              ),
+              ),
+              ),
+              ]
+              ,
               );
             },
           );

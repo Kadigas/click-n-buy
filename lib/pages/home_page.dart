@@ -133,7 +133,72 @@ class _HomePageState extends State<HomePage> {
             );
           }
 
-          List productList = snapshot.data!.docs;
+          List productList = snapshot.data!.docs.where((doc) {
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            return data['productStock'] > 0;
+          }).toList();
+
+          if (productList.isEmpty) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: MyTextField(
+                              controller: itemController,
+                              hintText: "Search...",
+                              obscureText: false,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const CartPage()),
+                                  );
+                                },
+                                icon: const Icon(Icons.shopping_cart),
+                              ),
+                              IconButton(
+                                onPressed: showSignOutDialog,
+                                icon: const Icon(Icons.logout),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ListUserPage(isSeller: false,)),
+                              );
+                            },
+                            icon: const Icon(Icons.chat),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height - 200,
+                        child: const Center(
+                          child: Text('No featured product yet.'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -212,6 +277,7 @@ class _HomePageState extends State<HomePage> {
                         String storeID = data['storeID'];
                         String? imageUrl = data['imageUrl'];
                         String price = formatCurrency.format(productPrice);
+                        int productStock = data['productStock'];
 
                         return GestureDetector(
                           onTap: () {
