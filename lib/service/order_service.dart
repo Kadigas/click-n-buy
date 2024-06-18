@@ -5,6 +5,7 @@ import 'package:fp_ppb/enums/status_order.dart';
 import 'package:fp_ppb/enums/status_shipping.dart';
 import 'package:fp_ppb/models/orderItem.dart';
 import 'package:fp_ppb/models/orders.dart';
+import 'package:fp_ppb/models/storeOrders.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 
 class OrderService {
@@ -103,5 +104,23 @@ class OrderService {
     } catch (e) {
       throw Exception('Failed to add to cart: $e');
     }
+  }
+
+  Future<void> addStoreOrder(String userID, storeID, orderID) async {
+    final Timestamp timestamp = Timestamp.now();
+
+    StoreOrders newOrder = StoreOrders(
+      userID: userID,
+      orderID: orderID,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    );
+
+    await _firestore
+        .collection('stores')
+        .doc(storeID)
+        .collection('orders')
+        .doc(orderID)
+        .set(newOrder.toMap());
   }
 }

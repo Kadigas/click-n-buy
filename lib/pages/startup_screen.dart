@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fp_ppb/pages/home_page.dart';
 import 'package:fp_ppb/pages/profile_page.dart';
 import 'package:fp_ppb/pages/transaction/transaction_page.dart';
+import 'package:fp_ppb/pages/wishlist_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class StartupScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _StartupScreenState extends State<StartupScreen> {
     return [
       const HomePage(),
       const TransactionPage(),
+      WishlistPage(),
       const ProfilePage(),
     ];
   }
@@ -27,13 +29,19 @@ class _StartupScreenState extends State<StartupScreen> {
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.home),
         title: ("Home"),
-        activeColorPrimary: Colors.black,
+        activeColorPrimary: Colors.blue,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.payment),
         title: ("Transactions"),
-        activeColorPrimary: Colors.black,
+        activeColorPrimary: Colors.green,
+        inactiveColorPrimary: Colors.grey,
+      ),
+      PersistentBottomNavBarItem(
+        icon: const Icon(Icons.favorite),
+        title: ("Wishlist"),
+        activeColorPrimary: Colors.red,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(

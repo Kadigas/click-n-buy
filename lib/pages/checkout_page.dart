@@ -173,11 +173,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
         String address = await userService.getUserAddress(user!.uid);
         DocumentReference orderDocRef = await orderService.addOrder(
             storeID, storeTotals, address, courierCategory, shippingCost);
+        await orderService.addStoreOrder(user!.uid, storeID, orderDocRef.id);
+
         for (var item in storeItems) {
           String productID = item['data']['productID'];
           int quantity = (item['data']['quantity'] as num).toInt();
           int newStock = stocks[productID]! - quantity;
-          print(newStock);
+
           await orderService.addOrderItem(
               orderDocRef.id, storeID, productID, quantity);
           await cartService.deleteCartProduct(productID);
