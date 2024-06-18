@@ -222,6 +222,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
+  bool validateCourier(String storeId) {
+    return selectedCouriers[storeId] != null;
+  }
+
+  bool validateShippingOption(String storeId) {
+    return selectedShippingOption[storeId] != null;
+  }
+
   void showSuccessMessage(String message) {
     showDialog(
       context: context,
@@ -381,16 +389,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const SizedBox(height: 10),
                           MyButton(
                             onTap: () async {
-                              _loadingState();
-                              await checkQuantitiesAndCheckout(
-                                  storeID,
-                                  storeTotals[storeID]!,
-                                  selectedCouriers[storeID]!,
-                                  shippingCosts[storeID]!);
-                              Navigator.of(context, rootNavigator: true).pop();
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                              showSuccessMessage("Success place an order!");
+                              if (validateCourier(storeID) &
+                                  validateShippingOption(storeID)) {
+                                _loadingState();
+                                await checkQuantitiesAndCheckout(
+                                    storeID,
+                                    storeTotals[storeID]!,
+                                    selectedCouriers[storeID]!,
+                                    shippingCosts[storeID]!);
+                                Navigator.of(context, rootNavigator: true)
+                                    .pop();
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                                showSuccessMessage("Success place an order!");
+                              } else {
+                                showErrorMessage(
+                                    "Please fill courier and shipping option");
+                              }
                             },
                             msg: 'Checkout $storeName',
                             color: Colors.black,
@@ -413,13 +428,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
             onTap: () async {
               _loadingState();
               for (var storeID in groupedItems.keys) {
-                await checkQuantitiesAndCheckout(storeID, storeTotals[storeID]!,
-                    selectedCouriers[storeID]!, shippingCosts[storeID]!);
+                if (!(validateCourier(storeID) &
+                    validateShippingOption(storeID))) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                  showErrorMessage(
+                      "please make sure to select courier and shipping");
+                  return;
+                }
+              }
+              for (var storeID in groupedItems.keys) {
+                await checkQuantitiesAndCheckout(
+                    storeID,
+                    storeTotals[storeID]!,
+                    selectedCouriers[storeID]!,
+                    shippingCosts[storeID]!);
               }
               Navigator.of(context, rootNavigator: true).pop();
-              Navigator.pop(context);
-              Navigator.pop(context);
-              showSuccessMessage("Success place an order!");
+              Navigator.of(context).pop();
             },
             msg: 'Proceed to Checkout All',
             color: Colors.black,
