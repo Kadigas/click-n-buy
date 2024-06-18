@@ -89,6 +89,28 @@ class ChatService {
         .set(newMessage.toMap());
   }
 
+  Future writeMessageList(Message newMessage, String currentUserId,
+      String receiverId, bool isSeller) async {
+    // if user, send to table user then match with it, so it need to reserve
+    final String userId = !isSeller ? receiverId : currentUserId;
+    final String sellerId = isSeller ? receiverId : currentUserId;
+    // send message tile to user
+    await _firestore
+        .collection("user_chats")
+        .doc(sellerId)
+        .collection('messages')
+        .doc(userId)
+        .set(newMessage.toMap());
+
+    // send message tile to store
+    await _firestore
+        .collection("store_chats")
+        .doc(userId)
+        .collection("messages")
+        .doc(sellerId)
+        .set(newMessage.toMap());
+  }
+
   Stream<QuerySnapshot> getMessages(String userId, otherUserId) {
     List<String> ids = [userId, otherUserId];
     ids.sort();
@@ -107,6 +129,17 @@ class ChatService {
     ids.sort();
     String chatRoomId = ids.join('_');
     return chatRoomId;
+  }
+
+  Future<QuerySnapshot> getLatestMessage(String userId, String otherId) {
+    String chatRoomId = getChatRoomId(userId, otherId);
+    return _firestore
+        .collection("chat_rooms")
+        .doc(chatRoomId)
+        .collection("messages")
+        .orderBy("timestamp", descending: true)
+        .limit(1)
+        .get();
   }
 
   Future<void> editMessage(String userId, String otherUserId, String messageId,
@@ -159,7 +192,8 @@ class ChatService {
 
     // if user, send to table user then match with it, so it need to reserve
     final String collection = isSeller ? "store_chats" : "user_chats";
-    print("is seller $isSeller collection $collection uid $userId others $otherUserId");
+    print(
+        "is seller $isSeller collection $collection uid $userId others $otherUserId");
     try {
       await _firestore
           .collection(collection)

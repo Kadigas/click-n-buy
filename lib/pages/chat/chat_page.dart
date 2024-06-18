@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../components/chat/chat_box.dart';
 import '../../components/chat/progress_dialog.dart';
+import '../../models/message.dart';
 import '../../models/users.dart';
 import '../../service/auth_service.dart';
 import '../../service/chat_service.dart';
@@ -137,6 +138,18 @@ class _ChatPageState extends State<ChatPage> {
       messageId,
       editedDataObj,
     );
+
+    // if last message
+    // if seller then point to users chat [sellerId][otherId]
+    // if not seller point to [otherId][SellerId]
+    QuerySnapshot lastMessage = await chatService.getLatestMessage(widget.userId, widget.otherUserId);
+    if (lastMessage.docs.isNotEmpty){
+      DocumentSnapshot latestMessageDoc = lastMessage.docs.first;
+      Message msg = Message.fromDocumentSnapshot(latestMessageDoc);
+      if (latestMessageDoc.id == messageId) {
+        await chatService.writeMessageList(msg, widget.userId, widget.otherUserId, widget.isSeller);
+      }
+    }
   }
 
   @override

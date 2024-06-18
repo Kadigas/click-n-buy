@@ -54,6 +54,7 @@ class ListUserPage extends StatelessWidget {
                       : messages[index]['receiverId'];
                   String clientName = messages[index]['userName'];
                   String messageType = messages[index]['type'];
+                  bool isDelete = messages[index]['isDelete'];
 
                   return FutureBuilder<String>(
                     future: storeService.getStoreName(storeId),
@@ -98,9 +99,17 @@ class ListUserPage extends StatelessWidget {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700),
                               ),
-                              subtitle: Text(messageType == 'image'
-                                  ? "🖼 photo"
-                                  : message),
+                              subtitle: Text(
+                                messageType == 'image'
+                                    ? "🖼 photo"
+                                    : isDelete
+                                        ? "message was deleted"
+                                        : message,
+                                style: TextStyle(
+                                    fontStyle: isDelete
+                                        ? FontStyle.italic
+                                        : FontStyle.normal),
+                              ),
                               // Customize this as per your user model
                               leading: const Icon(Icons.message),
                             ),
