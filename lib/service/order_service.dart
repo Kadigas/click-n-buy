@@ -182,9 +182,7 @@ class OrderService {
         .doc(orderID)
         .get();
 
-    List<OrderItem> orderItems = await fetchOrderItems(userID, orderID);
-
-    return Orders.fromMap(orderDoc.data() as Map<String, dynamic>, orderItems);
+    return Orders.fromMap(orderDoc.data() as Map<String, dynamic>);
   }
 
   Future<List<OrderItem>> fetchOrderItems(String userID, String orderID) async {

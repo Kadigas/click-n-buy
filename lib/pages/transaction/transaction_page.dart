@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fp_ppb/models/order_item.dart';
 import 'package:fp_ppb/models/product.dart';
 import 'package:fp_ppb/service/auth_service.dart';
 import 'package:fp_ppb/service/order_service.dart';
 import 'package:fp_ppb/service/product_service.dart';
 
-import '../../models/orderItem.dart';
 import '../../models/orders.dart';
 import '../../service/store_service.dart';
 

@@ -29,7 +29,7 @@ class Orders {
     required this.updatedAt,
   });
 
-  factory Orders.fromMap(Map<String, dynamic> map, List<OrderItem> orderItems) {
+  factory Orders.fromMap(Map<String, dynamic> map) {
     return Orders(
       storeID: map['storeID'],
       totalPrice: map['totalPrice'],
@@ -57,20 +57,5 @@ class Orders {
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
-  }
-
-  // Factory constructor to create an Order instance from a Map
-  factory Orders.fromMap(Map<String, dynamic> map) {
-    return Orders(
-      storeID: map['storeID'],
-      totalPrice: map['totalPrice'],
-      address: map['address'],
-      courier: CourierCategory.values.firstWhere((e) => e.name == map['courier']),
-      shippingCost: map['shippingCost'],
-      statusOrder: StatusOrder.values.firstWhere((e) => e.name == map['statusOrder']),
-      statusShipping: StatusShipping.values.firstWhere((e) => e.name == map['statusShipping']),
-      createdAt: map['createdAt'],
-      updatedAt: map['updatedAt'],
-    );
   }
 }
