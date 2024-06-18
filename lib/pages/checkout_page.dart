@@ -430,45 +430,45 @@ class _CheckoutPageState extends State<CheckoutPage> {
           );
         }).toList(),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SizedBox(
-          height: 50,
-          child: MyButton(
-            onTap: () async {
-              _loadingState();
-              for (var storeID in groupedItems.keys) {
-                if (!(validateCourier(storeID) && validateShippingOption(storeID))) {
-                  if (Navigator.canPop(context)) {
-                    Navigator.of(context, rootNavigator: true).pop();
-                  }
-                  showErrorMessage("Please make sure to select courier and shipping");
-                  return;
-                }
-              }
-              bool isSuccess = true;
-              for (var storeID in groupedItems.keys) {
-                bool isChecking = await checkQuantitiesAndCheckout(
-                  storeID,
-                  storeTotals[storeID]!,
-                  selectedCouriers[storeID]!,
-                  shippingCosts[storeID]!,
-                );
-                isSuccess = isChecking;
-              }
-              if (isSuccess) {
-                showSuccessMessage("Success checkout items");
-                if (Navigator.canPop(context)) {
-                  Navigator.of(context, rootNavigator: true).pop();
-                  Navigator.of(context).pop();
-                }
-              }
-            },
-            msg: 'Proceed to Checkout All',
-            color: Colors.black,
-          ),
-        ),
-      ),
+      // bottomNavigationBar: Padding(
+      //   padding: const EdgeInsets.all(16.0),
+      //   child: SizedBox(
+      //     height: 50,
+      //     child: MyButton(
+      //       onTap: () async {
+      //         _loadingState();
+      //         for (var storeID in groupedItems.keys) {
+      //           if (!(validateCourier(storeID) && validateShippingOption(storeID))) {
+      //             if (Navigator.canPop(context)) {
+      //               Navigator.of(context, rootNavigator: true).pop();
+      //             }
+      //             showErrorMessage("Please make sure to select courier and shipping");
+      //             return;
+      //           }
+      //         }
+      //         bool isSuccess = true;
+      //         for (var storeID in groupedItems.keys) {
+      //           bool isChecking = await checkQuantitiesAndCheckout(
+      //             storeID,
+      //             storeTotals[storeID]!,
+      //             selectedCouriers[storeID]!,
+      //             shippingCosts[storeID]!,
+      //           );
+      //           isSuccess = isChecking;
+      //         }
+      //         if (isSuccess) {
+      //           showSuccessMessage("Success checkout items");
+      //           if (Navigator.canPop(context)) {
+      //             Navigator.of(context, rootNavigator: true).pop();
+      //             Navigator.of(context).pop();
+      //           }
+      //         }
+      //       },
+      //       msg: 'Proceed to Checkout All',
+      //       color: Colors.black,
+      //     ),
+      //   ),
+      // ),
     );
   }
 }

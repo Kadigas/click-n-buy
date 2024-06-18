@@ -43,6 +43,7 @@ dependencies:
   image_picker:
   http:
   badges: ^2.0.1
+  shimmer:
 
 dev_dependencies:
   flutter_test:
