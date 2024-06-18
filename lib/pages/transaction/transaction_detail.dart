@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-class TransactionPage extends StatelessWidget {
-  const TransactionPage({super.key});
+class TransactionDetail extends StatelessWidget {
+  const TransactionDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Placeholder();
   }
 }
+

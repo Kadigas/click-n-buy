@@ -146,7 +146,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Future<void> checkQuantitiesAndCheckout(String storeID, double storeTotals,
+  Future<bool> checkQuantitiesAndCheckout(String storeID, double storeTotals,
       CourierCategory courierCategory, double shippingCost) async {
     bool allItemsAvailable = true;
     List<Map<String, dynamic>> storeItems =
@@ -159,12 +159,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       int stock = await productService.getProductStock(productID);
       stocks[productID] = stock;
 
+      print("$quantity || $stock");
       if (quantity > stock) {
         allItemsAvailable = false;
         Navigator.of(context, rootNavigator: true).pop();
         showErrorMessage('There\'s an item that is out of stock.');
         Navigator.pop(context);
-        break;
+        return false;
       }
     }
 
@@ -188,10 +189,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
           await productService.updateStoreProductStock(
               storeID, productID, newStock.toString());
         }
+        return true;
       } catch (e) {
         showErrorMessage(e.toString());
       }
     }
+    return false;
   }
 
   void showErrorMessage(String message) {
@@ -220,6 +223,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         );
       },
     );
+  }
+
+  bool validateCourier(String storeId) {
+    return selectedCouriers[storeId] != null;
+  }
+
+  bool validateShippingOption(String storeId) {
+    return selectedShippingOption[storeId] != null;
   }
 
   void showSuccessMessage(String message) {
@@ -381,16 +392,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const SizedBox(height: 10),
                           MyButton(
                             onTap: () async {
-                              _loadingState();
-                              await checkQuantitiesAndCheckout(
-                                  storeID,
-                                  storeTotals[storeID]!,
-                                  selectedCouriers[storeID]!,
-                                  shippingCosts[storeID]!);
-                              Navigator.of(context, rootNavigator: true).pop();
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                              showSuccessMessage("Success place an order!");
+                              if (validateCourier(storeID) &
+                                  validateShippingOption(storeID)) {
+                                _loadingState();
+                                bool passChecking = await checkQuantitiesAndCheckout(
+                                    storeID,
+                                    storeTotals[storeID]!,
+                                    selectedCouriers[storeID]!,
+                                    shippingCosts[storeID]!);
+                                if (passChecking){
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  showSuccessMessage("checkout success");
+                                }
+                              } else {
+                                showErrorMessage(
+                                    "Please fill courier and shipping option");
+                              }
                             },
                             msg: 'Checkout $storeName',
                             color: Colors.black,
@@ -413,13 +433,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
             onTap: () async {
               _loadingState();
               for (var storeID in groupedItems.keys) {
-                await checkQuantitiesAndCheckout(storeID, storeTotals[storeID]!,
-                    selectedCouriers[storeID]!, shippingCosts[storeID]!);
+                if (!(validateCourier(storeID) &
+                    validateShippingOption(storeID))) {
+                  Navigator.of(context, rootNavigator: true).pop();
+                  showErrorMessage(
+                      "please make sure to select courier and shipping");
+                  return;
+                }
               }
+              bool isSuccess = true;
+              for (var storeID in groupedItems.keys) {
+                bool isChecking = await checkQuantitiesAndCheckout(
+                    storeID,
+                    storeTotals[storeID]!,
+                    selectedCouriers[storeID]!,
+                    shippingCosts[storeID]!);
+                isSuccess = isChecking;
+              }
+              showSuccessMessage("success checkout items");
               Navigator.of(context, rootNavigator: true).pop();
-              Navigator.pop(context);
-              Navigator.pop(context);
-              showSuccessMessage("Success place an order!");
+              Navigator.of(context).pop();
             },
             msg: 'Proceed to Checkout All',
             color: Colors.black,
