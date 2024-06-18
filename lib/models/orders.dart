@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/enums/courier.dart';
 import 'package:fp_ppb/enums/status_order.dart';
 import 'package:fp_ppb/enums/status_shipping.dart';
-import 'package:fp_ppb/models/order_item.dart';
 
 class Orders {
   final String storeID;
