@@ -17,6 +17,17 @@ class OrderItem {
     required this.updatedAt,
   });
 
+  factory OrderItem.fromMap(Map<String, dynamic> map) {
+    return OrderItem(
+      storeID: map['storeID'],
+      productID: map['productID'],
+      quantity: map['quantity'],
+      productPrice: map['productPrice'],
+      createdAt: map['createdAt'],
+      updatedAt: map['updatedAt'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'storeID': storeID,

@@ -6,7 +6,6 @@ import 'package:fp_ppb/components/small_button.dart';
 import 'package:fp_ppb/pages/edit_profile_page.dart';
 import 'package:fp_ppb/pages/seller/register_store_page.dart';
 import 'package:fp_ppb/pages/seller/store_profile_page.dart';
-import 'package:fp_ppb/pages/wishlist_page.dart'; // Import halaman wishlist
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

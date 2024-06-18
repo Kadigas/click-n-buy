@@ -34,14 +34,23 @@ class UserService {
     });
   }
 
-  Future<void> updateHasStore(String docID) {
-    final Timestamp timestamp = Timestamp.now();
-    return users.doc(docID).update({'hasStore': true, 'updatedAt': timestamp});
+  Future<Map<String, dynamic>> fetchUserDetails(String userID) async {
+    DocumentSnapshot userDoc = await _firestore
+        .collection('users')
+        .doc(userID)
+        .get();
+
+    return userDoc.data() as Map<String, dynamic>;
   }
 
-  Future<String> getUserCity(String docID) async {
+  Future<void> updateHasStore(String userID) {
+    final Timestamp timestamp = Timestamp.now();
+    return users.doc(userID).update({'hasStore': true, 'updatedAt': timestamp});
+  }
+
+  Future<String> getUserCity(String userID) async {
     try {
-      DocumentSnapshot snapshot = await users.doc(docID).get();
+      DocumentSnapshot snapshot = await users.doc(userID).get();
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         return data['city'];
@@ -53,9 +62,9 @@ class UserService {
     }
   }
 
-  Future<String> getUserAddress(String docID) async {
+  Future<String> getUserAddress(String userID) async {
     try {
-      DocumentSnapshot snapshot = await users.doc(docID).get();
+      DocumentSnapshot snapshot = await users.doc(userID).get();
       if (snapshot.exists) {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         return data['address'];

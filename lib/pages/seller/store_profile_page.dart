@@ -184,8 +184,7 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                      const StoreTransactionPage(),
+                                      builder: (context) => StoreOrdersPage(storeID: storeID),
                                     ),
                                   );
                                 },
