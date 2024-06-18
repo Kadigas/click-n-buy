@@ -146,7 +146,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     });
   }
 
-  Future<void> checkQuantitiesAndCheckout(String storeID, double storeTotals,
+  Future<bool> checkQuantitiesAndCheckout(String storeID, double storeTotals,
       CourierCategory courierCategory, double shippingCost) async {
     bool allItemsAvailable = true;
     List<Map<String, dynamic>> storeItems =
@@ -159,12 +159,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
       int stock = await productService.getProductStock(productID);
       stocks[productID] = stock;
 
+      print("$quantity || $stock");
       if (quantity > stock) {
         allItemsAvailable = false;
         Navigator.of(context, rootNavigator: true).pop();
         showErrorMessage('There\'s an item that is out of stock.');
         Navigator.pop(context);
-        break;
+        return false;
       }
     }
 
@@ -188,10 +189,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
           await productService.updateStoreProductStock(
               storeID, productID, newStock.toString());
         }
+        return true;
       } catch (e) {
         showErrorMessage(e.toString());
       }
     }
+    return false;
   }
 
   void showErrorMessage(String message) {
@@ -392,16 +395,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               if (validateCourier(storeID) &
                                   validateShippingOption(storeID)) {
                                 _loadingState();
-                                await checkQuantitiesAndCheckout(
+                                bool passChecking = await checkQuantitiesAndCheckout(
                                     storeID,
                                     storeTotals[storeID]!,
                                     selectedCouriers[storeID]!,
                                     shippingCosts[storeID]!);
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop();
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                showSuccessMessage("Success place an order!");
+                                if (passChecking){
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  showSuccessMessage("checkout success");
+                                }
                               } else {
                                 showErrorMessage(
                                     "Please fill courier and shipping option");
@@ -436,13 +441,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   return;
                 }
               }
+              bool isSuccess = true;
               for (var storeID in groupedItems.keys) {
-                await checkQuantitiesAndCheckout(
+                bool isChecking = await checkQuantitiesAndCheckout(
                     storeID,
                     storeTotals[storeID]!,
                     selectedCouriers[storeID]!,
                     shippingCosts[storeID]!);
+                isSuccess = isChecking;
               }
+              showSuccessMessage("success checkout items");
               Navigator.of(context, rootNavigator: true).pop();
               Navigator.of(context).pop();
             },
