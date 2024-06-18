@@ -46,8 +46,23 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Store Profile"),
-        backgroundColor: Colors.white,
+        title: const Text("Store Profile", style: TextStyle(color: Colors.white),),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green, Colors.greenAccent],
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: FutureBuilder<QuerySnapshot>(
         future: _document,
@@ -184,7 +199,7 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => StoreOrdersPage(storeID: storeID),
+                                      builder: (context) => StoreTransactionPage(storeID: storeID),
                                     ),
                                   );
                                 },

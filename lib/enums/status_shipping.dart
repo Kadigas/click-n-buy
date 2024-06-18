@@ -6,8 +6,10 @@ enum StatusShipping {
   onProcess,
   onShipping,
   arrived,
-  finished
+  finished,
+  cancelled
 }
+
 extension StatusShippingExtension on StatusShipping {
   String get displayName {
     switch (this) {
@@ -23,6 +25,8 @@ extension StatusShippingExtension on StatusShipping {
         return 'Arrived';
       case StatusShipping.finished:
         return 'Finished';
+      case StatusShipping.cancelled:
+        return 'Cancelled';
       default:
         return '';
     }

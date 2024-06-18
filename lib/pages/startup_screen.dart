@@ -19,7 +19,7 @@ class _StartupScreenState extends State<StartupScreen> {
     return [
       const HomePage(),
       const TransactionPage(),
-      WishlistPage(),
+      const WishlistPage(),
       const ProfilePage(),
     ];
   }
