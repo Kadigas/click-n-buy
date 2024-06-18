@@ -10,6 +10,37 @@ import 'package:fp_ppb/service/auth_service.dart';
 class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Future<Orders> getOrderByUserId(String userId, )
+  Stream<List<Map<String, dynamic>>> getTransactions(String userId) {
+    return _firestore
+        .collection("users")
+        .doc(userId)
+        .collection("orders")
+        .orderBy("createdAt", descending: false)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs.map((doc) {
+        var data = doc.data();
+        data['id'] = doc.id; // Add document ID to the data map
+        return data;
+      }).toList();
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getOrderItems(
+      String userId, String orderId) {
+    return _firestore
+        .collection("users")
+        .doc(userId)
+        .collection("orders")
+        .doc(orderId)
+        .collection("orderItems")
+        .orderBy("createdAt", descending: false)
+        .snapshots()
+        .map((querySnapshot) =>
+            querySnapshot.docs.map((doc) => doc.data()).toList());
+  }
+
   Future<DocumentReference> addOrder(String storeID, double totalPrice,
       String address, CourierCategory courier, double shippingCost) {
     final Timestamp timestamp = Timestamp.now();

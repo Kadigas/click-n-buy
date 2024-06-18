@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fp_ppb/pages/home_page.dart';
 import 'package:fp_ppb/pages/profile_page.dart';
-import 'package:fp_ppb/pages/transaction_page.dart';
+import 'package:fp_ppb/pages/transaction/transaction_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 class StartupScreen extends StatefulWidget {
