@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fp_ppb/service/wishlist_service.dart';
 import '../models/wishlist.dart';
-import '../pages/show_product.dart'; // Import your ShowProductPage
+import '../pages/show_product.dart';
 
 class WishlistPage extends StatelessWidget {
   final WishlistService wishlistService = WishlistService();

@@ -185,7 +185,7 @@ class _StoreProfilePageState extends State<StoreProfilePage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                      const StoreTransactionPage(),
+                                      const StoreTransactionPage(storeId: '',),
                                     ),
                                   );
                                 },

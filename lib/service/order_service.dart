@@ -42,14 +42,14 @@ class OrderService {
 
     try {
       DocumentSnapshot productSnapshot =
-          await _firestore.collection('products').doc(productID).get();
+      await _firestore.collection('products').doc(productID).get();
 
       if (!productSnapshot.exists) {
         throw Exception('Product not found');
       }
 
       Map<String, dynamic> productData =
-          productSnapshot.data() as Map<String, dynamic>;
+      productSnapshot.data() as Map<String, dynamic>;
       double price = productData['productPrice'];
 
       OrderItem orderItem = OrderItem(
@@ -71,6 +71,33 @@ class OrderService {
           .set(orderItem.toMap());
     } catch (e) {
       throw Exception('Failed to add to cart: $e');
+    }
+  }
+
+  Future<List<DocumentSnapshot>> getUserOrders() async {
+    final User user = AuthService().getCurrentUser()!;
+    QuerySnapshot querySnapshot = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('orders')
+        .get();
+
+    print('Fetched ${querySnapshot.docs.length} orders for user ${user.uid}');
+    return querySnapshot.docs;
+  }
+
+
+  Future<String> getStoreName(String storeID) async {
+    try {
+      DocumentSnapshot storeSnapshot = await _firestore.collection('stores').doc(storeID).get();
+      if (storeSnapshot.exists) {
+        Map<String, dynamic> storeData = storeSnapshot.data() as Map<String, dynamic>;
+        return storeData['storeName'] ?? 'Unknown Store';
+      } else {
+        return 'Unknown Store';
+      }
+    } catch (e) {
+      return 'Unknown Store';
     }
   }
 }
