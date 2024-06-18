@@ -181,19 +181,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ],
                         ),
-                        // Tambahkan tombol wishlist disini
-                        SmallButton(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => WishlistPage(),
-                              ),
-                            );
-                          },
-                          msg: 'My Wishlist',
-                          color: Colors.red,
-                        ),
                       ],
                     ),
                   ),
