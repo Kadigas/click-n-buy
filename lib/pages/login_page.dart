@@ -81,19 +81,12 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 100),
+                const SizedBox(height: 50),
                 Image.network(
-                  "https://static.wikia.nocookie.net/kamenrider/images/a/a5/Hiden_Intelligence_Logo.png/revision/latest?cb=20221105005206",
-                  height: 50,
+                  "https://github.com/Kadigas/click-n-buy/assets/87473932/d6ea6f89-ee24-4448-ae64-8a2559679912",
+                  height: 250,
                 ),
-                const SizedBox(height: 35),
-                const Text(
-                  'Welcome Back! you\'ve been missed!',
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 35),
+                const SizedBox(height: 20),
                 MyTextField(
                   controller: emailController,
                   hintText: 'Email',

@@ -100,10 +100,10 @@ class ListUserPage extends StatelessWidget {
                                     fontWeight: FontWeight.w700),
                               ),
                               subtitle: Text(
-                                messageType == 'image'
-                                    ? "🖼 photo"
-                                    : isDelete
-                                        ? "message was deleted"
+                                isDelete
+                                    ? "message was deleted"
+                                    : messageType == 'image'
+                                        ? "🖼 photo"
                                         : message,
                                 style: TextStyle(
                                     fontStyle: isDelete
