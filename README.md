@@ -1,6 +1,6 @@
 # fp_ppb
 
-![image](https://github.com/Kadigas/click-n-buy/assets/87473932/9b39965d-d3da-4df4-ba99-464145c0c9b2)
+![image](https://github.com/Kadigas/click-n-buy/assets/87473932/d6ea6f89-ee24-4448-ae64-8a2559679912)
 
 A new Flutter project.
 
